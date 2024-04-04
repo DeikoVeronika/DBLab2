@@ -9,19 +9,19 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.FirstName)
             </th>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.LastName)
             </th>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.PhoneNumber)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Birthday)
+            <th class="table-name">
+                Дата народження
             </th>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.Email)
             </th>
             <th><a asp-action="Create">Створити нового клієнта</a> </th>
@@ -37,7 +37,10 @@
                 @Html.DisplayFor(modelItem => item.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                {
+                    <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Birthday)

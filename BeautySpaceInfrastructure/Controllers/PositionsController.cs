@@ -22,7 +22,7 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: Positions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Positions.ToListAsync());
+            return View(await _context.Positions.Include(p => p.Employees).OrderBy(p => p.Name).ToListAsync());
         }
 
         // GET: Positions/Details/5
@@ -58,6 +58,13 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Перевірка на унікальність імені
+                if (_context.Positions.Any(p => p.Name == position.Name))
+                {
+                    ModelState.AddModelError("Name", "Посада з таким ім'ям вже існує");
+                    return View(position);
+                }
+
                 _context.Add(position);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -95,6 +102,13 @@ namespace BeautySpaceInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
+                // Перевірка на унікальність імені
+                if (_context.Positions.Any(p => p.Name == position.Name))
+                {
+                    ModelState.AddModelError("Name", "Посада з таким ім'ям вже існує");
+                    return View(position);
+                }
+
                 try
                 {
                     _context.Update(position);
@@ -131,6 +145,14 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
+            // Перевірка чи посада не є посадою "Резерв"
+            if (position.Name == "Резерв")
+            {
+                TempData["ErrorMessage"] = "Ви не можете видаляти посаду \"Резерв\". ";
+
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(position);
         }
 
@@ -139,11 +161,33 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var position = await _context.Positions.FindAsync(id);
-            if (position != null)
+            var position = await _context.Positions.Include(p => p.Employees).FirstOrDefaultAsync(p => p.Id == id);
+            if (position == null)
             {
-                _context.Positions.Remove(position);
+                return NotFound();
             }
+
+            // Перенести працівників на посаду "Резерв"
+            var reservePosition = await _context.Positions.FirstOrDefaultAsync(p => p.Name == "Резерв");
+            if (reservePosition == null)
+            {
+                // Створити посаду "Резерв", якщо вона не існує
+                reservePosition = new Position { Name = "Резерв" };
+                _context.Positions.Add(reservePosition);
+                await _context.SaveChangesAsync();
+            }
+
+            // Створити копію колекції працівників перед зміною її елементів
+            var employeesToMove = position.Employees.ToList();
+
+            foreach (var employee in employeesToMove)
+            {
+                employee.PositionId = reservePosition.Id;
+                _context.Entry(employee).State = EntityState.Modified;
+            }
+
+            // Видалити вихідну посаду
+            _context.Positions.Remove(position);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

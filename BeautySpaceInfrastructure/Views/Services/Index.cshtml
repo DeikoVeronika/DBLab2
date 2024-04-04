@@ -10,13 +10,13 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>@Html.ActionLink("Створити нову послугу", "Create", new { categoryId = ViewBag.CategoryId })</th>

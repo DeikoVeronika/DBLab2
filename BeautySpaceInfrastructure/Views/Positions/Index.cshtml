@@ -9,7 +9,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
+            <th class="table-name">
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th><a asp-action="Create">Створити нову посаду</a></th>
@@ -30,3 +30,20 @@
 }
     </tbody>
 </table>
+
+@{
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var errorMessage = @Html.Raw(Json.Serialize(errorMessage));
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+        });
+    </script>
+}

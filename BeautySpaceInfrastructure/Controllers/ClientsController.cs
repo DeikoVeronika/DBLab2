@@ -22,7 +22,8 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: Clients
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clients.ToListAsync());
+            var clients = await _context.Clients.OrderBy(c => c.LastName).ThenBy(c => c.FirstName).ToListAsync();
+            return View(clients);
         }
 
         // GET: Clients/Details/5
@@ -56,6 +57,9 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FirstName,LastName,PhoneNumber,Birthday,Email,Id")] Client client)
         {
+            client.PhoneNumber = "+" + new string(client.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
+
+
             if (ModelState.IsValid)
             {
                 _context.Add(client);
@@ -92,6 +96,9 @@ namespace BeautySpaceInfrastructure.Controllers
             {
                 return NotFound();
             }
+
+            client.PhoneNumber = "+" + new string(client.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
+
 
             if (ModelState.IsValid)
             {
