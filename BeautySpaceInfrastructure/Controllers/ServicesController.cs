@@ -69,7 +69,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
             if (_context.Services.Any(s => s.Name == service.Name))
             {
-                ModelState.AddModelError("Name", "Це ім'я вже використовується. Виберіть інше.");
+                ModelState.AddModelError("Name", "Послуга з такою назвою вже існує. Оберіть іншу назву.");
                 var categories = _context.Categories.OrderBy(c => c.Name).ToList();
                 ViewBag.CategoryId = new SelectList(categories, "Id", "Name", service.CategoryId);
                 return View(service);
@@ -85,13 +85,13 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
             var service = await _context.Services.FindAsync(id);
             if (service == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", service.CategoryId);
             return View(service);
@@ -106,31 +106,37 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             if (id != service.Id)
             {
-                return NotFound();
+                return RedirectToAction("Details", "Categories", new { id = service.CategoryId });
             }
 
-            if (ModelState.IsValid)
+            int selectedCategoryId = service.CategoryId;
+
+            if (_context.Services.Any(s => s.Name == service.Name && s.Id != service.Id))
             {
-                try
-                {
-                    _context.Update(service);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ServiceExists(service.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("Name", "Послуга з такою назвою вже існує. Оберіть іншу назву.");
+                var categories = _context.Categories.OrderBy(c => c.Name).ToList();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedCategoryId);
+                return View(service);
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", service.CategoryId);
-            return View(service);
+
+            try
+            {
+                _context.Update(service);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ServiceExists(service.Id))
+                {
+                    return RedirectToAction("Details", "Categories", new { id = service.CategoryId });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction("Details", "Categories", new { id = service.CategoryId });
         }
 
         // GET: Services/Delete/5
@@ -138,7 +144,7 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Categories");
             }
 
             var service = await _context.Services
@@ -146,7 +152,7 @@ namespace BeautySpaceInfrastructure.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (service == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Categories");
             }
 
             return View(service);
@@ -158,13 +164,11 @@ namespace BeautySpaceInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var service = await _context.Services.FindAsync(id);
-            if (service != null)
-            {
-                _context.Services.Remove(service);
-            }
+            var categoryId = service.CategoryId;
+            _context.Services.Remove(service);
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Categories", new { id = categoryId });
         }
 
         private bool ServiceExists(int id)
