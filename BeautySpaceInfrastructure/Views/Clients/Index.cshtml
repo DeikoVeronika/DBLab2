@@ -1,14 +1,11 @@
 ﻿@model IEnumerable<BeautySpaceDomain.Model.Client>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Клієнти";
 }
 
-<h1>Index</h1>
+<h1>Список клієнтів</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -27,7 +24,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
-            <th></th>
+            <th><a asp-action="Create">Створити нового клієнта</a> </th>
         </tr>
     </thead>
     <tbody>
@@ -49,9 +46,9 @@
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
             </td>
         </tr>
 }

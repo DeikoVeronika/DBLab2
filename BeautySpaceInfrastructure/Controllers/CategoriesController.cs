@@ -40,12 +40,13 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            return View(category);
+            return RedirectToAction("Index", "Services", new { id = category.Id, name = category.Name});
         }
 
         // GET: Categories/Create
         public IActionResult Create()
         {
+            ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
@@ -58,6 +59,13 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (_context.Categories.Any(ts => ts.Name == category.Name))
+                {
+                    ModelState.AddModelError("Name", "Категорія з такою назвою вже існує");
+                    ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Name");
+                    return View(category);
+                }
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -95,6 +103,13 @@ namespace BeautySpaceInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
+                if (_context.Categories.Any(ts => ts.Name == category.Name))
+                {
+                    ModelState.AddModelError("Name", "Категорія з такою назвою вже існує");
+                    ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Name");
+                    return View(category);
+                }
+
                 try
                 {
                     _context.Update(category);
@@ -139,15 +154,29 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.Include(c => c.Services).FirstOrDefaultAsync(c => c.Id == id);
             if (category != null)
             {
+                // Якщо категорія не має послуг, просто видалити категорію
+                if (category.Services.Count == 0)
+                {
+                    _context.Categories.Remove(category);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Видалити всі послуги пов'язані з категорією
+                _context.Services.RemoveRange(category.Services);
+
+                //Видалити категорію
                 _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
 
         private bool CategoryExists(int id)
         {

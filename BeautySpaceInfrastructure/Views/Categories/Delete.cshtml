@@ -18,10 +18,46 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
+
+    <form id="deleteForm" asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
+    <button class="btn btn-danger" onclick="confirmDelete() ">Видалити</button>
+
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete() {
+            $.ajax({
+                url: '/Services/GetServiceCount',
+                type: 'GET',
+                data: { categoryId: @Model.Id },
+                success: function (servicesCount) {
+                    if (servicesCount > 0) {
+                        Swal.fire({
+                            title: 'Ви впевнені?',
+                            text: "Якщо ви видалите цю категорію всі її послуги будут втрачені.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ab0c24',
+                            cancelButtonColor: '#6d6d6d',
+                            confirmButtonText: 'Видалити категорію',
+                            cancelButtonText: 'Cкасувати видалення'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById('deleteForm').submit();
+                            }
+                        })
+                    } else {
+                        document.getElementById('deleteForm').submit();
+                    }
+                }
+            });
+        }
+
+
+    </script>
+}

@@ -1,12 +1,12 @@
 ﻿@model BeautySpaceDomain.Model.Service
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Створення послуги";
 }
 
-<h1>Create</h1>
+<h1>Створення нової послуги</h1>
 
-<h4>Service</h4>
+<h4>Нова послуга</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -31,6 +31,7 @@
                 <label asp-for="CategoryId" class="control-label"></label>
                 <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -39,7 +40,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Відмінити створення</a>
 </div>
 
 @section Scripts {

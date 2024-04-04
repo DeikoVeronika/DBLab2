@@ -20,10 +20,13 @@ namespace BeautySpaceInfrastructure.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id, string? name)
         {
-            var dbbeautySpaceContext = _context.Employees.Include(e => e.Position);
-            return View(await dbbeautySpaceContext.ToListAsync());
+            if(id == null) return RedirectToAction("Positions", "Index");
+            ViewBag.PositionId = id;
+            ViewBag.PositionName = name;
+            var employeeByPosition = _context.Employees.Where(e => e.PositionId == id).Include(e => e.Position);
+            return View(await employeeByPosition.ToListAsync());
         }
 
         // GET: Employees/Details/5

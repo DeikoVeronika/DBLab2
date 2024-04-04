@@ -40,7 +40,7 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            return View(position);
+            return RedirectToAction("Index", "Employees", new {id = position.Id, name = position.Name});
         }
 
         // GET: Positions/Create
