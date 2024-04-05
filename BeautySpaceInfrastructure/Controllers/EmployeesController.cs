@@ -49,9 +49,9 @@ namespace BeautySpaceInfrastructure.Controllers
         }
 
         // GET: Employees/Create
-        public IActionResult Create()
+        public IActionResult Create(int? positionId)
         {
-            ViewData["PositionId"] = new SelectList(_context.Positions, "Id", "Name");
+            ViewBag.PositionId = new SelectList(_context.Positions.OrderBy(p => p.Name), "Id", "Name", positionId);
             return View();
         }
 
@@ -60,17 +60,23 @@ namespace BeautySpaceInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["PositionId"] = new SelectList(_context.Positions, "Id", "Name", employee.PositionId);
-            return View(employee);
-        }
+public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
+{
+    var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber);
+
+    if (existingEmployee != null && existingEmployee.Id != employee.Id)
+    {
+        ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
+        var positions = _context.Positions.OrderBy(p => p.Name).ToList();
+        ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
+        return View(employee);
+    }
+
+    _context.Add(employee);
+    await _context.SaveChangesAsync();
+    return RedirectToAction("Details", "Positions", new { id = positionId, name = _context.Positions.Where(e => e.Id == positionId).FirstOrDefault().Name });
+}
+
 
         // GET: Employees/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -101,28 +107,33 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber && s.Id != employee.Id);
+
+            if (existingEmployee != null)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
+                var positions = _context.Positions.OrderBy(p => p.Name).ToList();
+                ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
+                return View(employee);
             }
-            ViewData["PositionId"] = new SelectList(_context.Positions, "Id", "Name", employee.PositionId);
-            return View(employee);
+
+            try
+            {
+                _context.Update(employee);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EmployeeExists(employee.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction("Details", "Positions", new { id = employee.PositionId });
         }
 
         // GET: Employees/Delete/5
