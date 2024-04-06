@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BeautySpaceDomain.Model;
 using BeautySpaceInfrastructure;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 
 namespace BeautySpaceInfrastructure.Controllers
 {
@@ -20,10 +21,15 @@ namespace BeautySpaceInfrastructure.Controllers
         }
 
         // GET: EmployeeServices
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id, string? name)
         {
-            var dbbeautySpaceContext = _context.EmployeeServices.Include(e => e.Employee).Include(e => e.Service);
-            return View(await dbbeautySpaceContext.ToListAsync());
+            if (id == null) return RedirectToAction("Services", "Index");
+
+            ViewBag.ServiceId = id;
+            ViewBag.ServiceName = name;
+
+            var employeeByService = _context.EmployeeServices.Where(es => es.ServiceId == id).Include(es => es.Employee).Include(es => es.Service);
+            return View(await employeeByService.ToListAsync());
         }
 
         // GET: EmployeeServices/Details/5
@@ -47,9 +53,17 @@ namespace BeautySpaceInfrastructure.Controllers
         }
 
         // GET: EmployeeServices/Create
-        public IActionResult Create()
+        public IActionResult Create(int? serviceId)
         {
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName");
+            var services = _context.Services.OrderBy(c => c.Name).ToList();
+            ViewBag.ServiceId = new SelectList(_context.Services.OrderBy(p => p.Name), "Id", "Name", serviceId);
+            ViewBag.ServiceName = _context.Services.FirstOrDefault(s => s.Id == serviceId)?.Name;
+
+
+            ViewData["EmployeeId"] = new SelectList(_context.Employees.Select(e => new {
+                Id = e.Id,
+                FullName = e.FirstName + " " + e.LastName
+            }), "Id", "FullName");
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name");
             return View();
         }
@@ -59,73 +73,79 @@ namespace BeautySpaceInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServiceId,EmployeeId,Id")] EmployeeService employeeService)
+        public async Task<IActionResult> Create(int serviceId, [Bind("ServiceId,EmployeeId")] EmployeeService employeeService)
         {
-            if (ModelState.IsValid)
+            // Перевірка, чи працівник вже доданий до цієї послуги
+            var existingEmployeeService = await _context.EmployeeServices
+                .FirstOrDefaultAsync(es => es.ServiceId == serviceId && es.EmployeeId == employeeService.EmployeeId);
+
+            if (existingEmployeeService != null)
             {
-                _context.Add(employeeService);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["Message"] = "Цей працівник вже доданий до цієї послуги.";
+                // Перенаправлення на сторінку створення
+                return RedirectToAction("Create", "EmployeeServices", new { serviceId });
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeService.EmployeeId);
-            ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", employeeService.ServiceId);
-            return View(employeeService);
+
+            _context.Add(employeeService);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "Services", new { id = serviceId, name = _context.Services.FirstOrDefault(s => s.Id == serviceId)?.Name });
         }
+
 
         // GET: EmployeeServices/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var employeeService = await _context.EmployeeServices.FindAsync(id);
-            if (employeeService == null)
-            {
-                return NotFound();
-            }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeService.EmployeeId);
-            ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", employeeService.ServiceId);
-            return View(employeeService);
-        }
+        //    var employeeService = await _context.EmployeeServices.FindAsync(id);
+        //    if (employeeService == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeService.EmployeeId);
+        //    ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", employeeService.ServiceId);
+        //    return View(employeeService);
+        //}
 
         // POST: EmployeeServices/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServiceId,EmployeeId,Id")] EmployeeService employeeService)
-        {
-            if (id != employeeService.Id)
-            {
-                return NotFound();
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("ServiceId,EmployeeId,Id")] EmployeeService employeeService)
+        //{
+        //    if (id != employeeService.Id)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(employeeService);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeServiceExists(employeeService.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeService.EmployeeId);
-            ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", employeeService.ServiceId);
-            return View(employeeService);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(employeeService);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!EmployeeServiceExists(employeeService.Id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", employeeService.EmployeeId);
+        //    ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", employeeService.ServiceId);
+        //    return View(employeeService);
+        //}
 
         // GET: EmployeeServices/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -153,14 +173,16 @@ namespace BeautySpaceInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employeeService = await _context.EmployeeServices.FindAsync(id);
+            int serviceId = employeeService.ServiceId; // Зберігаємо ID послуги перед видаленням
             if (employeeService != null)
             {
                 _context.EmployeeServices.Remove(employeeService);
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Services", new { id = serviceId, name = _context.Services.FirstOrDefault(s => s.Id == serviceId)?.Name });
         }
+
 
         private bool EmployeeServiceExists(int id)
         {

@@ -51,6 +51,7 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: Employees/Create
         public IActionResult Create(int? positionId)
         {
+            var positions = _context.Positions.OrderBy(c => c.Name).ToList();
             ViewBag.PositionId = new SelectList(_context.Positions.OrderBy(p => p.Name), "Id", "Name", positionId);
             return View();
         }
@@ -62,11 +63,12 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
         {
-            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber);
-
             employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
-            if (existingEmployee != null && existingEmployee.Id != employee.Id)
+
+            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber && s.Id != employee.Id);
+
+            if (existingEmployee != null)
             {
                 ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
                 var positions = _context.Positions.OrderBy(p => p.Name).ToList();
@@ -165,15 +167,21 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees.Include(e => e.EmployeeServices).FirstOrDefaultAsync(e => e.Id == id);
             if (employee != null)
             {
+                // Видалити всі EmployeeServices пов'язані з цим працівником
+                _context.EmployeeServices.RemoveRange(employee.EmployeeServices);
+
+                // Видалити працівника
                 _context.Employees.Remove(employee);
+
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction("Details", "Positions", new { id = employee.PositionId });
         }
+
 
         private bool EmployeeExists(int id)
         {

@@ -1,24 +1,19 @@
 ﻿@model IEnumerable<BeautySpaceDomain.Model.EmployeeService>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Працівники послуги";
 }
 
-<h1>Index</h1>
+<h1>Працівники послуги @ViewBag.ServiceName</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Employee)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Service)
-            </th>
-            <th></th>
+            <th>@Html.ActionLink("Додати працівника до послуги", "Create", new { serviceId = ViewBag.ServiceId })</th>
         </tr>
     </thead>
     <tbody>
@@ -26,14 +21,12 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Service.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+ @*                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> | *@
+                <a asp-action="Details" asp-route-id="@item.Id">Графік працівника</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
             </td>
         </tr>
 }

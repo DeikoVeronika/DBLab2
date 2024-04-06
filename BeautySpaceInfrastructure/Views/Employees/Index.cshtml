@@ -6,9 +6,6 @@
 
 <h1>Працівники посади @ViewBag.PositionName</h1>
 
-<p>
-    <a asp-action="Create">Створити нового працівника</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -24,7 +21,7 @@
             <th class="table-name">
                 @Html.DisplayNameFor(model => model.PhoneNumber)
             </th>
-            <th></th>
+            <th>@Html.ActionLink("Створити нового працівника", "Create", new { positionId = ViewBag.PositionId })</th>
         </tr>
     </thead>
     <tbody>

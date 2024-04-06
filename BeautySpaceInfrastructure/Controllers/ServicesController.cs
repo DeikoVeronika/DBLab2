@@ -47,7 +47,7 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            return View(service);
+            return RedirectToAction("Index", "EmployeeServices", new { id = service.Id, name = service.Name });
         }
 
         // GET: Services/Create
@@ -67,9 +67,9 @@ namespace BeautySpaceInfrastructure.Controllers
         public async Task<IActionResult> Create(int categoryId, [Bind("Name,Description,Price,CategoryId")] Service service)
         {
 
-            if (_context.Services.Any(s => s.Name == service.Name))
+            if (_context.Services.Any(s => s.Name == service.Name && s.Description == service.Description))
             {
-                ModelState.AddModelError("Name", "Послуга з такою назвою вже існує. Оберіть іншу назву.");
+                ModelState.AddModelError("Description", "Послуга з такою назвою та лписом вже існує. Оберіть іншу назву.");
                 var categories = _context.Categories.OrderBy(c => c.Name).ToList();
                 ViewBag.CategoryId = new SelectList(categories, "Id", "Name", service.CategoryId);
                 return View(service);
@@ -163,13 +163,19 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var service = await _context.Services.FindAsync(id);
+            var service = await _context.Services.Include(s => s.EmployeeServices).FirstOrDefaultAsync(s => s.Id == id);
             var categoryId = service.CategoryId;
+
+            // Видалити всі EmployeeServices пов'язані з цією послугою
+            _context.EmployeeServices.RemoveRange(service.EmployeeServices);
+
+            // Видалити послугу
             _context.Services.Remove(service);
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Details", "Categories", new { id = categoryId });
         }
+
 
         private bool ServiceExists(int id)
         {
