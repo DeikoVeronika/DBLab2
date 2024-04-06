@@ -173,7 +173,7 @@ namespace BeautySpaceInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employeeService = await _context.EmployeeServices.FindAsync(id);
-            int serviceId = employeeService.ServiceId; // Зберігаємо ID послуги перед видаленням
+            int serviceId = employeeService.ServiceId; 
             if (employeeService != null)
             {
                 _context.EmployeeServices.Remove(employeeService);

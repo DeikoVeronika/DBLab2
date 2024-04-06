@@ -59,6 +59,30 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             client.PhoneNumber = "+" + new string(client.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
+            //пеервірка на вік
+            if (client.Birthday.HasValue)
+            {
+                var today = DateOnly.FromDateTime(DateTime.Today);
+                var birthday = client.Birthday.Value;
+                var age = today.Year - birthday.Year;
+
+                if (client.Birthday > today.AddYears(-age)) age--;
+
+                if (age < 5 || age > 105)
+                {
+                    ModelState.AddModelError("Birthday", "Вік клієнта не може бути меншим за 5 років та більшим за 105");
+                }
+            }
+
+            //перевірка на існування клієнта
+            var existingClient = await _context.Clients
+                .FirstOrDefaultAsync(c => c.Email == client.Email && c.FirstName == client.FirstName && c.LastName == client.LastName);
+
+            if (existingClient != null)
+            {
+                ModelState.AddModelError("Email", "Клієнт з таким іменем, прізвищем та поштою вже існує");
+                return View(client);
+            }
 
             if (ModelState.IsValid)
             {
@@ -68,6 +92,7 @@ namespace BeautySpaceInfrastructure.Controllers
             }
             return View(client);
         }
+
 
         // GET: Clients/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -99,6 +124,30 @@ namespace BeautySpaceInfrastructure.Controllers
 
             client.PhoneNumber = "+" + new string(client.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
+            //пеервірка на вік
+            if (client.Birthday.HasValue)
+            {
+                var today = DateOnly.FromDateTime(DateTime.Today);
+                var birthday = client.Birthday.Value;
+                var age = today.Year - birthday.Year;
+
+                if (client.Birthday > today.AddYears(-age)) age--;
+
+                if (age < 5 || age > 105)
+                {
+                    ModelState.AddModelError("Birthday", "Вік клієнта не може бути меншим за 5 років та більшим за 105");
+                }
+            }
+
+            //перевірка на існування клієнта
+            var existingClient = await _context.Clients
+                .FirstOrDefaultAsync(c => c.Email == client.Email && c.FirstName == client.FirstName && c.LastName == client.LastName);
+
+            if (existingClient != null)
+            {
+                ModelState.AddModelError("Email", "Клієнт з таким іменем, прізвищем та поштою вже існує");
+                return View(client);
+            }
 
             if (ModelState.IsValid)
             {
