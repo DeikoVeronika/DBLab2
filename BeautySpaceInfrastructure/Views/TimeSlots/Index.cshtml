@@ -19,38 +19,50 @@
                 @Html.DisplayNameFor(model => model.EndTime)
             </th>
             <th class="table-name">
-                @Html.DisplayNameFor(model => model.IsBooked)
+                Майстер
             </th>
             <th class="table-name">
-                @Html.DisplayNameFor(model => model.EmployeeService)
+                Послуга
             </th>
-            <th> <a asp-action="Create">Створити новий таймслот</a></th>
+            <th> <a asp-action="Create">Створити новий час для запису</a></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsBooked)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmployeeService.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
+    @foreach (var item in Model) {
+                <tr class="@(item.IsBooked ? "table-danger" : "")">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndTime)
+                </td>
+                <td>
+                    @* @Html.DisplayFor(modelItem => item.EmployeeService.Id) *@
+                    @{
+                        DbbeautySpaceContext dbbeautySpaceContextEmployeeFullName = new DbbeautySpaceContext();
+                        var employeeFullName = dbbeautySpaceContextEmployeeFullName.Employees.Find(item.EmployeeService.EmployeeId);
+                    }
+                    @employeeFullName.FirstName @employeeFullName.LastName
+
+                </td>
+                <td>
+                    @* @Html.DisplayFor(modelItem => item.EmployeeService.Id) *@
+                    @{
+                        DbbeautySpaceContext dbbeautySpaceContextServiceName = new DbbeautySpaceContext();
+                        var serviceName = dbbeautySpaceContextServiceName.Services.Find(item.EmployeeService.ServiceId);
+                    }
+                    @serviceName.Name 
+
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                </td>
+            </tr>
+    }
     </tbody>
 </table>

@@ -59,14 +59,9 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeServiceId,Date,StartTime,EndTime,IsBooked,Id")] TimeSlot timeSlot)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(timeSlot);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id", timeSlot.EmployeeServiceId);
-            return View(timeSlot);
+            _context.Add(timeSlot);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: TimeSlots/Edit/5
@@ -98,8 +93,6 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
                 try
                 {
                     _context.Update(timeSlot);
@@ -117,9 +110,6 @@ namespace BeautySpaceInfrastructure.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
-            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id", timeSlot.EmployeeServiceId);
-            return View(timeSlot);
         }
 
         // GET: TimeSlots/Delete/5
