@@ -11,8 +11,7 @@ public partial class Employee : Entity
 
     public string FirstName { get; set; } = null!;
 
-    [Required(ErrorMessage = "Введіть прізвище працівника")]
-    [Display(Name = "Прізвище")]
+    [Display(Name = "Прізвище (необов'язково)")]
     public string? LastName { get; set; }
 
     public int PositionId { get; set; }

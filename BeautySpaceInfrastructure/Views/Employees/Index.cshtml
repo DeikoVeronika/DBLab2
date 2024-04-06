@@ -16,7 +16,7 @@
                 @Html.DisplayNameFor(model => model.FirstName)
             </th>
             <th class="table-name">
-                @Html.DisplayNameFor(model => model.LastName)
+                Прізвище
             </th>
             <th class="table-name">
                 @Html.DisplayNameFor(model => model.EmployeePortrait)
@@ -40,8 +40,11 @@
                 @Html.DisplayFor(modelItem => item.EmployeePortrait)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
+                @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                {
+                    <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
+                }
+             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |

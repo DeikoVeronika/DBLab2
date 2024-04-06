@@ -60,22 +60,24 @@ namespace BeautySpaceInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
-{
-    var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber);
+        public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
+        {
+            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber);
 
-    if (existingEmployee != null && existingEmployee.Id != employee.Id)
-    {
-        ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
-        var positions = _context.Positions.OrderBy(p => p.Name).ToList();
-        ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
-        return View(employee);
-    }
+            employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
-    _context.Add(employee);
-    await _context.SaveChangesAsync();
-    return RedirectToAction("Details", "Positions", new { id = positionId, name = _context.Positions.Where(e => e.Id == positionId).FirstOrDefault().Name });
-}
+            if (existingEmployee != null && existingEmployee.Id != employee.Id)
+            {
+                ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
+                var positions = _context.Positions.OrderBy(p => p.Name).ToList();
+                ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
+                return View(employee);
+            }
+
+            _context.Add(employee);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "Positions", new { id = positionId, name = _context.Positions.Where(e => e.Id == positionId).FirstOrDefault().Name });
+        }
 
 
         // GET: Employees/Edit/5
@@ -106,6 +108,9 @@ public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastNam
             {
                 return NotFound();
             }
+
+            employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
+
 
             var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber && s.Id != employee.Id);
 
@@ -167,7 +172,7 @@ public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastNam
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Positions", new { id = employee.PositionId });
         }
 
         private bool EmployeeExists(int id)

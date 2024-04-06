@@ -22,7 +22,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="PhoneNumber" class="control-label"></label>
-                <input asp-for="PhoneNumber" class="form-control" />
+                <input type="text" id="phoneInput" asp-for="PhoneNumber" class="form-control" placeholder="+380 (__) ___-__-__" data-mask="+380 (__) ___-__-__" inputmode="numeric" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -48,4 +48,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
+    <script src="/js/phone.js"></script>
+
 }
