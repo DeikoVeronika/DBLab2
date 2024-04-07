@@ -103,7 +103,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                if (_context.Categories.Any(ts => ts.Name == category.Name))
+                if (_context.Categories.Any(c => c.Name == category.Name && c.Id != category.Id))
                 {
                     ModelState.AddModelError("Name", "Категорія з такою назвою вже існує");
                     ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "Name");

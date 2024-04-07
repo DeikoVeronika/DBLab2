@@ -103,7 +103,7 @@ namespace BeautySpaceInfrastructure.Controllers
             if (ModelState.IsValid)
             {
                 // Перевірка на унікальність імені
-                if (_context.Positions.Any(p => p.Name == position.Name))
+                if (_context.Positions.Any(p => p.Name == position.Name && p.Id != position.Id))
                 {
                     ModelState.AddModelError("Name", "Посада з таким ім'ям вже існує");
                     return View(position);
