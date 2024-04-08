@@ -67,9 +67,9 @@ namespace BeautySpaceInfrastructure.Controllers
         public async Task<IActionResult> Create(int categoryId, [Bind("Name,Description,Price,CategoryId")] Service service)
         {
 
-            if (_context.Services.Any(s => s.Name == service.Name && s.Description == service.Description))
+            if (_context.Services.Any(s => s.Name == service.Name))
             {
-                ModelState.AddModelError("Description", "Послуга з такою назвою та лписом вже існує. Оберіть іншу назву.");
+                ModelState.AddModelError("Name", "Послуга з такою назвою вже існує. Оберіть іншу назву.");
                 var categories = _context.Categories.OrderBy(c => c.Name).ToList();
                 ViewBag.CategoryId = new SelectList(categories, "Id", "Name", service.CategoryId);
                 return View(service);
