@@ -10,6 +10,7 @@ public partial class Service : Entity
 
     [Required(ErrorMessage = "Введіть назву послуги")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Назва послуги не може містити у собі менше двох символів")]
+    [RegularExpression(@"^.*[а-яА-Яa-zA-Z].*[а-яА-Яa-zA-Z].*$", ErrorMessage = "Назва послуги повинна містити принаймні дві букви")]
     [Display(Name = "Послуга")]
     public string Name
     {

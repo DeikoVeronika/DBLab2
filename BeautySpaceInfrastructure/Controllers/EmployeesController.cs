@@ -61,8 +61,17 @@ namespace BeautySpaceInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
+        public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee, IFormFile employeePortrait)
         {
+            if (employeePortrait != null && employeePortrait.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await employeePortrait.CopyToAsync(memoryStream);
+                    employee.EmployeePortrait = memoryStream.ToArray();
+                }
+            }
+
             employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
 

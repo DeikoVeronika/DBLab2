@@ -1,0 +1,49 @@
+﻿@model BeautySpaceDomain.Model.Category
+
+@{
+    ViewData["Title"] = "Імпорт даних про категорії послуг";
+    var errorMessage = TempData["ErrorMessage"] as string;
+
+}
+
+<h1>Імпорт</h1>
+
+<div>
+    <h3>Оберіть excel-файл для завантаження</h3>
+    @using (Html.BeginForm("Import", "Categories", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+    {
+        <div>
+            Завантажте Excel-файл:
+            <input type="file" name="fileExcel" id="fileExcel" accept=".xlsx, .xls" />
+            <div>
+                <input type="submit" value="Завантажити" />
+            </div>
+        </div>
+    }
+
+    <div class="error-message">
+        @if (ViewBag.Error != null)
+        {
+            var errors = ViewBag.Error.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var error in errors)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+        }
+    </div>
+</div>
+
+
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var errorMessage = @Html.Raw(Json.Serialize(errorMessage));
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+        });
+    </script>
+}

@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Категорії";
+    var successMessage = TempData["SuccessMessage"] as string;
+
 }
 
 <h1>Доступні категорії</h1>
@@ -32,3 +34,23 @@
 }
     </tbody>
 </table>
+
+<div style="display:flex; justify-content:space-around;">
+    <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Import">Завантажити з файлу</a>
+    <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Export">Експортувати у файл</a>
+</div>
+
+
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var successMessage = @Html.Raw(Json.Serialize(successMessage));
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+}

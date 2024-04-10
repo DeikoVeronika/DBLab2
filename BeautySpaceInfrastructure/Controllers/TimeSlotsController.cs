@@ -48,20 +48,73 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: TimeSlots/Create
         public IActionResult Create()
         {
-            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id");
+            // Отримуємо всі записи з таблиці EmployeeServices
+            var employeeServices = _context.EmployeeServices
+                .Include(es => es.Employee)
+                .Include(es => es.Service)
+                .ToHashSet();
+
+
+            // Створюємо список для ServiceId
+            var serviceList = employeeServices
+                .GroupBy(es => es.ServiceId)
+                .Select(group => group.First())
+                .Select(es => new SelectListItem
+                {
+                    Value = es.ServiceId.ToString(),
+                    Text = es.Service.Name
+                })
+                .ToHashSet();
+
+
+
+            // Створюємо список для EmployeeId
+            var employeeList = employeeServices
+            .GroupBy(es => es.EmployeeId)
+            .Select(group => group.First())
+            .Select(es => new SelectListItem
+            {
+                Value = es.EmployeeId.ToString(),
+                Text = es.Employee.FirstName
+            })
+            .ToHashSet();
+
+            // Передаємо створені списки у ViewBag
+            ViewBag.ServiceIdList = new SelectList(serviceList, "Value", "Text");
+            ViewBag.EmployeeIdList = new SelectList(employeeList, "Value", "Text");
+
             return View();
         }
+
 
         // POST: TimeSlots/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeServiceId,Date,StartTime,EndTime,IsBooked,Id")] TimeSlot timeSlot)
+        public async Task<IActionResult> Create(int serviceId, int employeeId, [Bind("Date,StartTime,EndTime,IsBooked,Id")] TimeSlot timeSlot)
         {
-            _context.Add(timeSlot);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                // Визначення EmployeeServiceId на основі вибраних працівника та послуги
+                var employeeService = await _context.EmployeeServices.FirstOrDefaultAsync(es => es.EmployeeId == employeeId && es.ServiceId == serviceId);
+
+                // Якщо не вдалося знайти відповідний запис EmployeeService, повертається сторінка 404 
+                if (employeeService == null)
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+
+                // Встановлюємо правильне значення EmployeeServiceId для TimeSlot
+                timeSlot.EmployeeServiceId = employeeService.Id;
+
+                _context.Add(timeSlot);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id", timeSlot.EmployeeServiceId);
+            return View(timeSlot);
         }
 
         // GET: TimeSlots/Edit/5
@@ -150,5 +203,24 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             return _context.TimeSlots.Any(e => e.Id == id);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeesByServiceId(int serviceId)
+        {
+            var employees = await _context.EmployeeServices
+                .Where(es => es.ServiceId == serviceId)
+                .Select(es => new SelectListItem
+                {
+                    Value = es.EmployeeId.ToString(), 
+                    Text = es.Employee.FirstName
+                })
+                .Distinct()
+                .ToListAsync();
+
+            employees.Insert(0, new SelectListItem { Value = "", Text = "Оберіть працівника" });
+
+            return Json(employees);
+        }
+
     }
 }

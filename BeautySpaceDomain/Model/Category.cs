@@ -10,6 +10,7 @@ public partial class Category : Entity
 
     [Required(ErrorMessage = "Введіть назву категорії")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Назва категорії не може містити у собі менше двох символів")]
+    [RegularExpression(@"^.*[а-яА-Яa-zA-Z].*[а-яА-Яa-zA-Z].*$", ErrorMessage = "Назва послуги повинна містити принаймні дві букви")]
     [Display(Name="Категорія")]
     public string Name
     {
