@@ -16,12 +16,16 @@
 
             <div class="form-group">
                 <label asp-for="EmployeeService.ServiceId" class="control-label">Service</label>
-                <select id="ServiceId" class="form-control" asp-items="ViewBag.ServiceIdList"></select>
+                <select id="ServiceId" class="form-control" asp-items="ViewBag.ServiceIdList">
+                    <option value="" disabled selected>Оберіть послугу</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label asp-for="EmployeeService.EmployeeId" class="control-label">Employee</label>
-                <select id="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeIdList"></select>
+                <select id="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeIdList">
+                    <option value="" disabled selected>Спочатку оберіть послугу</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -63,10 +67,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Функція для встановлення стану EmployeeId
+            function setEmployeeIdState(disabled) {
+                $('#EmployeeId').prop('disabled', disabled);
+            }
+
+            // При зміні ServiceId
             $('#ServiceId').change(function () {
                 var serviceId = $(this).val();
                 if (serviceId) {
-                    $('#selectedServiceId').val(serviceId); // встновлення ServiceId
+                    $('#selectedServiceId').val(serviceId); // Встановлення ServiceId
                     $.ajax({
                         url: '/TimeSlots/GetEmployeesByServiceId',
                         type: 'GET',
@@ -74,6 +84,13 @@
                         success: function (data) {
                             var employeeSelect = $('#EmployeeId');
                             employeeSelect.empty();
+                            // Дефолтне значення
+                            employeeSelect.append($('<option>', {
+                                value: '',
+                                text: 'Оберіть працівника', 
+                                disabled: 'disabled', 
+                                selected: 'selected' 
+                            }));
 
                             $.each(data, function (i, item) {
                                 employeeSelect.append($('<option>', {
@@ -81,19 +98,29 @@
                                     text: item.text
                                 }));
                             });
-                        }
 
+                            // Після отримання даних активуємо EmployeeId
+                            setEmployeeIdState(false);
+                        }
                     });
+                } else {
+                    // Якщо ServiceId не обрано, робимо EmployeeId неактивним
+                    setEmployeeIdState(true);
                 }
             });
 
+            // При зміні EmployeeId
             $('#EmployeeId').change(function () {
                 var employeeId = $(this).val();
                 if (employeeId) {
-                    $('#selectedEmployeeId').val(employeeId); // встновлення EmployeeId
+                    $('#selectedEmployeeId').val(employeeId); // Встановлення EmployeeId
                 }
             });
+
+            // Початкове стан EmployeeId
+            setEmployeeIdState(true);
         });
+
 
     </script>
 

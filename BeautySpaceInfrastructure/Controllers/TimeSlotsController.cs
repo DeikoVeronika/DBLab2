@@ -217,8 +217,6 @@ namespace BeautySpaceInfrastructure.Controllers
                 .Distinct()
                 .ToListAsync();
 
-            employees.Insert(0, new SelectListItem { Value = "", Text = "Оберіть працівника" });
-
             return Json(employees);
         }
 
