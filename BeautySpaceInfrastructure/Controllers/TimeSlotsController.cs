@@ -130,40 +130,114 @@ namespace BeautySpaceInfrastructure.Controllers
             {
                 return NotFound();
             }
-            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id", timeSlot.EmployeeServiceId);
+
+            var employeeService = await _context.EmployeeServices
+                .Include(es => es.Employee)
+                .Include(es => es.Service)
+                .FirstOrDefaultAsync(es => es.Id == timeSlot.EmployeeServiceId);
+
+            if (employeeService == null)
+            {
+                return NotFound();
+            }
+
+            // Отримуємо всі записи з таблиці EmployeeServices
+            var employeeServices = _context.EmployeeServices
+                .Include(es => es.Employee)
+                .Include(es => es.Service)
+                .ToHashSet();
+
+            // Створюємо список для ServiceId
+            var serviceList = employeeServices
+                .GroupBy(es => es.ServiceId)
+                .Select(group => group.First())
+                .Select(es => new SelectListItem
+                {
+                    Value = es.ServiceId.ToString(),
+                    Text = es.Service.Name,
+                    Selected = es.ServiceId == employeeService.ServiceId
+                })
+                .ToList();
+
+            // Створюємо список для EmployeeId
+            var employeeList = employeeServices
+            .GroupBy(es => es.EmployeeId)
+            .Select(group => group.First())
+            .Select(es => new SelectListItem
+            {
+                Value = es.EmployeeId.ToString(),
+                Text = es.Employee.FirstName
+            })
+            .ToHashSet();
+
+            // Створюємо список для EmployeeId, відфільтрований за ServiceId
+            var employeeListByService = employeeServices
+                .Where(es => es.ServiceId == employeeService.ServiceId)
+                .GroupBy(es => es.EmployeeId)
+                .Select(group => group.First())
+                .Select(es => new SelectListItem
+                {
+                    Value = es.EmployeeId.ToString(),
+                    Text = es.Employee.FirstName,
+                    Selected = es.EmployeeId == employeeService.EmployeeId
+                })
+                .ToList();
+
+            // Передаємо створені списки у ViewBag
+            ViewBag.ServiceIdList = new SelectList(serviceList, "Value", "Text");
+            ViewBag.EmployeeIdList = new SelectList(employeeListByService, "Value", "Text");
+
+
+
             return View(timeSlot);
         }
+
+
+
 
         // POST: TimeSlots/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeServiceId,Date,StartTime,EndTime,IsBooked,Id")] TimeSlot timeSlot)
+        public async Task<IActionResult> Edit(int id, int serviceId, int employeeId, [Bind("Date,StartTime,EndTime,IsBooked,Id")] TimeSlot timeSlot)
         {
             if (id != timeSlot.Id)
             {
                 return NotFound();
             }
 
-                try
+            // Визначення EmployeeServiceId на основі вибраних працівника та послуги
+            var employeeService = await _context.EmployeeServices.FirstOrDefaultAsync(es => es.EmployeeId == employeeId && es.ServiceId == serviceId);
+
+            // Якщо не вдалося знайти відповідний запис EmployeeService, повертається сторінка 404 
+            if (employeeService == null)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
+            // Встановлюємо правильне значення EmployeeServiceId для TimeSlot
+            timeSlot.EmployeeServiceId = employeeService.Id;
+
+            try
+            {
+                _context.Update(timeSlot);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TimeSlotExists(timeSlot.Id))
                 {
-                    _context.Update(timeSlot);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!TimeSlotExists(timeSlot.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: TimeSlots/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -205,6 +279,7 @@ namespace BeautySpaceInfrastructure.Controllers
         }
 
         [HttpGet]
+        //для створення
         public async Task<IActionResult> GetEmployeesByServiceId(int serviceId)
         {
             var employees = await _context.EmployeeServices
@@ -219,6 +294,20 @@ namespace BeautySpaceInfrastructure.Controllers
 
             return Json(employees);
         }
+
+        [HttpGet]
+        //для редагування
+        public JsonResult GetEmployeesByService(int serviceId)
+        {
+            var employees = _context.EmployeeServices
+                .Where(es => es.ServiceId == serviceId)
+                .Select(es => new { Value = es.EmployeeId.ToString(), Text = es.Employee.FirstName })
+                .ToList();
+
+            return Json(employees);
+        }
+
+
 
     }
 }
