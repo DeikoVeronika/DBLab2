@@ -12,8 +12,8 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" id="selectedServiceId" name="serviceId" value="@Model.EmployeeService.ServiceId" />
-            <input type="hidden" id="selectedEmployeeId" name="employeeId" value="@Model.EmployeeService.EmployeeId" />
+            <input type="hidden" id="selectedServiceId" name="serviceId" value="@Model.EmployeeService?.ServiceId ?? string.Empty" />
+            <input type="hidden" id="selectedEmployeeId" name="employeeId" value="@Model.EmployeeService?.EmployeeId ?? string.Empty" />
 
 
 
@@ -36,13 +36,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
-                <span asp-validation-for="StartTime" class="text-danger"></span>
+                <input type="time" asp-for="StartTime" class="form-control" id="startTimeInput" />
+                <span id="startTimeError" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="EndTime" class="control-label"></label>
-                <input asp-for="EndTime" class="form-control" />
-                <span asp-validation-for="EndTime" class="text-danger"></span>
+                <input type="time" asp-for="EndTime" class="form-control" id="endTimeInput" />
+                <span id="endTimeError" asp-validation-for="EndTime" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -62,43 +63,64 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="/js/timeSlotDateError.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        var message = TempData["Message"] as string;
+    }
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <script>
+            $(document).ready(function () {
+                var message = @Html.Raw(Json.Serialize(message));
+                if (message) {
+                    alert(message);
+                }
+            });
+        </script>
+    }
+
+    <script src="/js/timeSlotError.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Ініціалізувати selectedServiceId та selectedEmployeeId
-            var selectedServiceId = $('#EmployeeService_ServiceId').val();
-            var selectedEmployeeId = $('#EmployeeService_EmployeeId').val();
+            var serviceSelect = $('#EmployeeService_ServiceId');
+            var employeeSelect = $('#EmployeeService_EmployeeId');
+
+            function updateSelectedValues() {
+                $('#selectedServiceId').val(serviceSelect.val());
+                $('#selectedEmployeeId').val(employeeSelect.val());
+            }
+
+            function updateEmployeeOptions(employees) {
+                employeeSelect.empty();
+                employeeSelect.append($('<option/>', {
+                    value: "",
+                    text: "Оберіть працівника",
+                    disabled: "disabled", 
+                    selected: "selected"  
+                }));
+                $.each(employees, function (index, employee) {
+                    employeeSelect.append($('<option/>', {
+                        value: employee.value,
+                        text: employee.text
+                    }));
+                });
+            }
+
+            serviceSelect.change(function () {
+                var selectedServiceId = $(this).val();
+                if (selectedServiceId) {
+                    $.getJSON('/TimeSlots/GetEmployeesByService', { serviceId: selectedServiceId }, updateEmployeeOptions);
+                }
+                updateSelectedValues();
+            });
+
+            employeeSelect.change(updateSelectedValues);
 
             // Встановити початкові значення
-            $('#selectedServiceId').val(selectedServiceId);
-            $('#selectedEmployeeId').val(selectedEmployeeId);
-
-            // При зміні ServiceId
-            $('#EmployeeService_ServiceId').change(function () {
-                var selectedServiceId = $(this).val();
-                $('#selectedServiceId').val(selectedServiceId); // Встановлення ServiceId
-                if (selectedServiceId) {
-                    $.getJSON('/TimeSlots/GetEmployeesByService', { serviceId: selectedServiceId }, function (employees) {
-                        var employeeSelect = $('#EmployeeService_EmployeeId');
-                        employeeSelect.empty();
-                        $.each(employees, function (index, employee) {
-                            employeeSelect.append($('<option/>', {
-                                value: employee.value,
-                                text: employee.text
-                            }));
-                        });
-                    });
-                }
-            });
-
-            // При зміні EmployeeId
-            $('#EmployeeService_EmployeeId').change(function () {
-                var selectedEmployeeId = $(this).val();
-                $('#selectedEmployeeId').val(selectedEmployeeId); // Встановлення EmployeeId
-            });
+            updateSelectedValues();
         });
+
 
     </script>
 

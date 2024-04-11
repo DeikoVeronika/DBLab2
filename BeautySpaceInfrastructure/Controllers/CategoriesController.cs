@@ -159,15 +159,16 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.Include(c => c.Services).ThenInclude(s => s.EmployeeServices).FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _context.Categories.Include(c => c.Services).ThenInclude(s => s.EmployeeServices).ThenInclude(es => es.TimeSlots).FirstOrDefaultAsync(c => c.Id == id);
             if (category != null)
             {
-                // Якщо категорія не має послуг, просто видалити категорію
-                if (category.Services.Count == 0)
+                // Видалити всі TimeSlots, пов'язані з EmployeeServices цієї категорії
+                foreach (var service in category.Services)
                 {
-                    _context.Categories.Remove(category);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    foreach (var employeeService in service.EmployeeServices)
+                    {
+                        _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+                    }
                 }
 
                 // Видалити всі EmployeeServices, пов'язані з послугами цієї категорії
@@ -186,6 +187,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
 

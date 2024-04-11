@@ -163,8 +163,14 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var service = await _context.Services.Include(s => s.EmployeeServices).FirstOrDefaultAsync(s => s.Id == id);
+            var service = await _context.Services.Include(s => s.EmployeeServices).ThenInclude(es => es.TimeSlots).FirstOrDefaultAsync(s => s.Id == id);
             var categoryId = service.CategoryId;
+
+            // Видалити всі TimeSlots, пов'язані з EmployeeServices цієї послуги
+            foreach (var employeeService in service.EmployeeServices)
+            {
+                _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+            }
 
             // Видалити всі EmployeeServices пов'язані з цією послугою
             _context.EmployeeServices.RemoveRange(service.EmployeeServices);

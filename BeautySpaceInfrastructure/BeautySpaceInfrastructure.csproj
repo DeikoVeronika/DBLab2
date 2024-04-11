@@ -27,4 +27,8 @@
     <ProjectReference Include="..\BeautySpaceDomain\BeautySpaceDomain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="img\" />
+  </ItemGroup>
+
 </Project>

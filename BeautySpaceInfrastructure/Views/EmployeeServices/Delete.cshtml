@@ -25,9 +25,43 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form id="deleteForm" asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Скасувати видалення</a>
+        <a asp-action="Index">Назад</a>
     </form>
+    <button class="btn btn-danger" onclick="confirmDelete() ">Видалити</button>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete() {
+            $.ajax({
+                url: '/TimeSlots/GetTimeSlotCount', // Змініть URL на відповідний
+                type: 'GET',
+                data: { employeeServiceId: @Model.Id }, // Змініть параметр на відповідний
+                success: function (timeSlotCount) {
+                    if (timeSlotCount > 0) {
+                        Swal.fire({
+                            title: 'Ви впевнені?',
+                            text: "Якщо ви видалите працівника цієї послуги, всі його таймслоти та бронювання будуть втрачені.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ab0c24',
+                            cancelButtonColor: '#6d6d6d',
+                            confirmButtonText: 'Видалити EmployeeService',
+                            cancelButtonText: 'Cкасувати видалення'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById('deleteForm').submit();
+                            }
+                        })
+                    } else {
+                        document.getElementById('deleteForm').submit();
+                    }
+                }
+            });
+        }
+
+    </script>
+}

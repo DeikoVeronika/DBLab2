@@ -170,12 +170,18 @@ namespace BeautySpaceInfrastructure.Controllers
         // POST: EmployeeServices/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employeeService = await _context.EmployeeServices.FindAsync(id);
-            int serviceId = employeeService.ServiceId; 
+            var employeeService = await _context.EmployeeServices.Include(es => es.TimeSlots).FirstOrDefaultAsync(es => es.Id == id);
+            int serviceId = employeeService.ServiceId;
+
             if (employeeService != null)
             {
+                // Видалити всі TimeSlots, пов'язані з цим EmployeeService
+                _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+
+                // Видалити EmployeeService
                 _context.EmployeeServices.Remove(employeeService);
             }
 
@@ -183,6 +189,17 @@ namespace BeautySpaceInfrastructure.Controllers
             return RedirectToAction("Details", "Services", new { id = serviceId, name = _context.Services.FirstOrDefault(s => s.Id == serviceId)?.Name });
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeServiceCount(int serviceId)
+        {
+            var service = await _context.Services.Include(s => s.EmployeeServices).FirstOrDefaultAsync(s => s.Id == serviceId);
+            if (service == null)
+            {
+                return NotFound();
+            }
+            return Ok(service.EmployeeServices.Count);
+        }
 
         private bool EmployeeServiceExists(int id)
         {

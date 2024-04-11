@@ -63,14 +63,7 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int positionId, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee, IFormFile employeePortrait)
         {
-            if (employeePortrait != null && employeePortrait.Length > 0)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await employeePortrait.CopyToAsync(memoryStream);
-                    employee.EmployeePortrait = memoryStream.ToArray();
-                }
-            }
+            employee.EmployeePortrait = await ProcessImageAsync(employeePortrait);
 
             employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
@@ -113,44 +106,46 @@ namespace BeautySpaceInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee)
+
+        public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,PositionId,EmployeePortrait,PhoneNumber,Id")] Employee employee, IFormFile employeePortrait)
         {
             if (id != employee.Id)
             {
                 return NotFound();
             }
 
+            // Отримання поточного працівника з бази даних
+            var existingEmployee = await _context.Employees.FindAsync(id);
+
+            if (existingEmployee == null)
+            {
+                return NotFound();
+            }
+
+            // Перевірка, чи користувач передав нове зображення
+            if (employeePortrait != null)
+            {
+                // Якщо так, обробляємо нове зображення
+                employee.EmployeePortrait = await ProcessImageAsync(employeePortrait);
+            }
+            else
+            {
+                // Якщо ні, зберігаємо поточне зображення
+                employee.EmployeePortrait = existingEmployee.EmployeePortrait;
+            }
+
             employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
 
 
-            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber && s.Id != employee.Id);
+            // Оновлення і збереження працівника
+            _context.Entry(existingEmployee).CurrentValues.SetValues(employee);
+            await _context.SaveChangesAsync();
 
-            if (existingEmployee != null)
-            {
-                ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
-                var positions = _context.Positions.OrderBy(p => p.Name).ToList();
-                ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
-                return View(employee);
-            }
-
-            try
-            {
-                _context.Update(employee);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeeExists(employee.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
             return RedirectToAction("Details", "Positions", new { id = employee.PositionId });
         }
+
+
+
 
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -196,5 +191,30 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             return _context.Employees.Any(e => e.Id == id);
         }
+
+        public async Task<byte[]> ProcessImageAsync(IFormFile imageFile)
+        {
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await imageFile.CopyToAsync(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+            else
+            {
+                var defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "img", "employeeAvatar.jpg");
+                using (var fileStream = new FileStream(defaultImagePath, FileMode.Open))
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await fileStream.CopyToAsync(memoryStream);
+                        return memoryStream.ToArray();
+                    }
+                }
+            }
+        }
+
     }
 }

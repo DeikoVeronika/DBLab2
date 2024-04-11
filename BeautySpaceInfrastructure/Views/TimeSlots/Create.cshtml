@@ -11,7 +11,8 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" id="selectedServiceId" name="serviceId" />
-            <input type="hidden" id="selectedEmployeeId" name="employeeId" />
+            <input type="hidden" id="selectedEmployeeId" name="employeeId"  />
+
 
 
             <div class="form-group">
@@ -19,7 +20,9 @@
                 <select id="ServiceId" class="form-control" asp-items="ViewBag.ServiceIdList">
                     <option value="" disabled selected>Оберіть послугу</option>
                 </select>
+                <span asp-validation-for="EmployeeService.ServiceId" class="text-danger"></span>
             </div>
+
 
             <div class="form-group">
                 <label asp-for="EmployeeService.EmployeeId" class="control-label">Employee</label>
@@ -35,13 +38,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
-                <span asp-validation-for="StartTime" class="text-danger"></span>
+                <input type="time" asp-for="StartTime" class="form-control" id="startTimeInput" />
+                <span id="startTimeError" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="EndTime" class="control-label"></label>
-                <input asp-for="EndTime" class="form-control" />
-                <span asp-validation-for="EndTime" class="text-danger"></span>
+                <input type="time" asp-for="EndTime" class="form-control" id="endTimeInput" />
+                <span id="endTimeError" asp-validation-for="EndTime" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -55,6 +59,8 @@
     </div>
 </div>
 
+
+
 <div>
     <a asp-action="Index">Скасувати</a>
 </div>
@@ -62,11 +68,45 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        var message = TempData["Message"] as string;
+
     }
-    <script src="/js/timeSlotDateError.js"></script>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <script>
+            $(document).ready(function () {
+                var message = @Html.Raw(Json.Serialize(message));
+                if (message) {
+                    alert(message);
+                }
+            });
+        </script>
+    }
+
+    <script>
+        document.getElementById('timeInput').onchange = function () {
+            var inputTime = this.value;
+            var minTime = "09:00";
+            var maxTime = "18:00";
+
+            if (inputTime < minTime || inputTime > maxTime) {
+                document.getElementById('timeError').textContent = 'Час повинен бути між 09:00 та 18:00';
+            } else {
+                document.getElementById('timeError').textContent = '';
+            }
+        };
+    </script>
+
+    <script src="/js/timeSlotError.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
+            // var selectedServiceId = $('#selectedServiceId').val();
+            // var selectedEmployeeId = $('#selectedEmployeeId').val();
+            // $('#ServiceId').val(selectedServiceId);
+            // $('#EmployeeId').val(selectedEmployeeId);
+
             // Функція для встановлення стану EmployeeId
             function setEmployeeIdState(disabled) {
                 $('#EmployeeId').prop('disabled', disabled);

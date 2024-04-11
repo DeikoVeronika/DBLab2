@@ -33,10 +33,44 @@
             @Html.DisplayFor(model => model.Category.Name)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
+
+    <form asp-action="Delete" id="deleteForm">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Назад</a>
     </form>
+    <button class="btn btn-danger" onclick="confirmDelete()">Видалити</button>
+
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete() {
+            $.ajax({
+                url: '/EmployeeServices/GetEmployeeServiceCount', // Змініть URL на відповідний
+                type: 'GET',
+                data: { serviceId: @Model.Id }, // Змініть параметр на відповідний
+                success: function (employeeServiceCount) {
+                    if (employeeServiceCount > 0) {
+                        Swal.fire({
+                            title: 'Ви впевнені?',
+                            text: "Якщо ви видалите цю послугу, всі працівники цієї послуги, їхні таймслоти та бронювання будуть втрачені.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ab0c24',
+                            cancelButtonColor: '#6d6d6d',
+                            confirmButtonText: 'Видалити послугу',
+                            cancelButtonText: 'Cкасувати видалення'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById('deleteForm').submit();
+                            }
+                        })
+                    } else {
+                        document.getElementById('deleteForm').submit();
+                    }
+                }
+            });
+        }
+    </script>
+}

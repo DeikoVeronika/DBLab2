@@ -48,43 +48,10 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: TimeSlots/Create
         public IActionResult Create()
         {
-            // Отримуємо всі записи з таблиці EmployeeServices
-            var employeeServices = _context.EmployeeServices
-                .Include(es => es.Employee)
-                .Include(es => es.Service)
-                .ToHashSet();
-
-
-            // Створюємо список для ServiceId
-            var serviceList = employeeServices
-                .GroupBy(es => es.ServiceId)
-                .Select(group => group.First())
-                .Select(es => new SelectListItem
-                {
-                    Value = es.ServiceId.ToString(),
-                    Text = es.Service.Name
-                })
-                .ToHashSet();
-
-
-
-            // Створюємо список для EmployeeId
-            var employeeList = employeeServices
-            .GroupBy(es => es.EmployeeId)
-            .Select(group => group.First())
-            .Select(es => new SelectListItem
-            {
-                Value = es.EmployeeId.ToString(),
-                Text = es.Employee.FirstName
-            })
-            .ToHashSet();
-
-            // Передаємо створені списки у ViewBag
-            ViewBag.ServiceIdList = new SelectList(serviceList, "Value", "Text");
-            ViewBag.EmployeeIdList = new SelectList(employeeList, "Value", "Text");
-
+            PopulateDropdownsForCreate();
             return View();
         }
+
 
 
         // POST: TimeSlots/Create
@@ -94,8 +61,16 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int serviceId, int employeeId, [Bind("Date,StartTime,EndTime,IsBooked,Id")] TimeSlot timeSlot)
         {
+            // *** виведення помиилки для окремого списку, скидання списку послуги коли не обрано працівника ***
+            if (serviceId == 0 || employeeId == 0)
+            {
+                ModelState.AddModelError("", "Оберіть послугу та працівника.");
+            }
+
             if (ModelState.IsValid)
             {
+
+                
                 // Визначення EmployeeServiceId на основі вибраних працівника та послуги
                 var employeeService = await _context.EmployeeServices.FirstOrDefaultAsync(es => es.EmployeeId == employeeId && es.ServiceId == serviceId);
 
@@ -108,12 +83,20 @@ namespace BeautySpaceInfrastructure.Controllers
                 // Встановлюємо правильне значення EmployeeServiceId для TimeSlot
                 timeSlot.EmployeeServiceId = employeeService.Id;
 
+                var existingTimeSlot = await _context.TimeSlots.FirstOrDefaultAsync(ts => ts.EmployeeServiceId == timeSlot.EmployeeServiceId && ts.Date == timeSlot.Date && ts.StartTime == timeSlot.StartTime && ts.EndTime == timeSlot.EndTime);
+                if (existingTimeSlot != null)
+                {
+                    TempData["Message"] = "Часовий слот з такими датою, часом початку, часом закінчення та працівником вже існує.";
+                    PopulateDropdownsForCreate();
+                    return View(timeSlot);
+                }
+
                 _context.Add(timeSlot);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id", timeSlot.EmployeeServiceId);
+            PopulateDropdownsForCreate();
             return View(timeSlot);
         }
 
@@ -141,58 +124,19 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Отримуємо всі записи з таблиці EmployeeServices
-            var employeeServices = _context.EmployeeServices
-                .Include(es => es.Employee)
-                .Include(es => es.Service)
-                .ToHashSet();
+            var employeeServices = GetAllEmployeeServices();
 
-            // Створюємо список для ServiceId
-            var serviceList = employeeServices
-                .GroupBy(es => es.ServiceId)
-                .Select(group => group.First())
-                .Select(es => new SelectListItem
-                {
-                    Value = es.ServiceId.ToString(),
-                    Text = es.Service.Name,
-                    Selected = es.ServiceId == employeeService.ServiceId
-                })
-                .ToList();
+            var serviceList = GetServiceList(employeeServices);
 
-            // Створюємо список для EmployeeId
-            var employeeList = employeeServices
-            .GroupBy(es => es.EmployeeId)
-            .Select(group => group.First())
-            .Select(es => new SelectListItem
-            {
-                Value = es.EmployeeId.ToString(),
-                Text = es.Employee.FirstName
-            })
-            .ToHashSet();
+            var employeeList = GetEmployeeList(employeeServices);
 
-            // Створюємо список для EmployeeId, відфільтрований за ServiceId
-            var employeeListByService = employeeServices
-                .Where(es => es.ServiceId == employeeService.ServiceId)
-                .GroupBy(es => es.EmployeeId)
-                .Select(group => group.First())
-                .Select(es => new SelectListItem
-                {
-                    Value = es.EmployeeId.ToString(),
-                    Text = es.Employee.FirstName,
-                    Selected = es.EmployeeId == employeeService.EmployeeId
-                })
-                .ToList();
+            var employeeListByService = GetEmployeeListByService(employeeServices, employeeService.ServiceId, employeeService.EmployeeId);
 
-            // Передаємо створені списки у ViewBag
             ViewBag.ServiceIdList = new SelectList(serviceList, "Value", "Text");
             ViewBag.EmployeeIdList = new SelectList(employeeListByService, "Value", "Text");
 
-
-
             return View(timeSlot);
         }
-
-
 
 
         // POST: TimeSlots/Edit/5
@@ -218,6 +162,21 @@ namespace BeautySpaceInfrastructure.Controllers
 
             // Встановлюємо правильне значення EmployeeServiceId для TimeSlot
             timeSlot.EmployeeServiceId = employeeService.Id;
+
+            var existingTimeSlot = await _context.TimeSlots.FirstOrDefaultAsync(ts =>
+        ts.Date == timeSlot.Date &&
+        ts.StartTime == timeSlot.StartTime &&
+        ts.EndTime == timeSlot.EndTime &&
+        ts.EmployeeServiceId == timeSlot.EmployeeServiceId &&
+        ts.Id != timeSlot.Id);
+
+            if (existingTimeSlot != null)
+            {
+                TempData["Message"] = "Часовий слот з такими датою, часом початку, часом закінчення та працівником вже існує.";
+
+                PopulateDropdownsForCreate();
+                return View(timeSlot);
+            }
 
             try
             {
@@ -278,6 +237,63 @@ namespace BeautySpaceInfrastructure.Controllers
             return _context.TimeSlots.Any(e => e.Id == id);
         }
 
+        private HashSet<EmployeeService> GetAllEmployeeServices()
+        {
+            return _context.EmployeeServices
+                .Include(es => es.Employee)
+                .Include(es => es.Service)
+                .ToHashSet();
+        }
+        private HashSet<SelectListItem> GetServiceList(HashSet<EmployeeService> employeeServices)
+        {
+            return employeeServices
+                .GroupBy(es => es.ServiceId)
+                .Select(group => group.First())
+                .Select(es => new SelectListItem
+                {
+                    Value = es.ServiceId.ToString(),
+                    Text = es.Service.Name
+                })
+                .ToHashSet();
+        }
+        private HashSet<SelectListItem> GetEmployeeList(HashSet<EmployeeService> employeeServices)
+        {
+            return employeeServices
+                .GroupBy(es => es.EmployeeId)
+                .Select(group => group.First())
+                .Select(es => new SelectListItem
+                {
+                    Value = es.EmployeeId.ToString(),
+                    Text = es.Employee.FirstName
+                })
+                .ToHashSet();
+        }
+        private List<SelectListItem> GetEmployeeListByService(HashSet<EmployeeService> employeeServices, int serviceId, int selectedEmployeeId)
+        {
+            var employeeListByService = employeeServices
+                .Where(es => es.ServiceId == serviceId)
+                .GroupBy(es => es.EmployeeId)
+                .Select(group => group.First())
+                .Select(es => new SelectListItem
+                {
+                    Value = es.EmployeeId.ToString(),
+                    Text = es.Employee.FirstName,
+                    Selected = es.EmployeeId == selectedEmployeeId
+                })
+                .ToList();
+
+            return employeeListByService;
+        }
+        private void PopulateDropdownsForCreate()
+        {
+            var employeeServices = GetAllEmployeeServices();
+            var serviceList = GetServiceList(employeeServices);
+            var employeeList = GetEmployeeList(employeeServices);
+
+            ViewBag.ServiceIdList = new SelectList(serviceList, "Value", "Text");
+            ViewBag.EmployeeIdList = new SelectList(employeeList, "Value", "Text");
+        }
+
         [HttpGet]
         //для створення
         public async Task<IActionResult> GetEmployeesByServiceId(int serviceId)
@@ -307,6 +323,16 @@ namespace BeautySpaceInfrastructure.Controllers
             return Json(employees);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetTimeSlotCount(int employeeServiceId)
+        {
+            var employeeService = await _context.EmployeeServices.Include(es => es.TimeSlots).FirstOrDefaultAsync(es => es.Id == employeeServiceId);
+            if (employeeService == null)
+            {
+                return NotFound();
+            }
+            return Ok(employeeService.TimeSlots.Count);
+        }
 
 
     }
