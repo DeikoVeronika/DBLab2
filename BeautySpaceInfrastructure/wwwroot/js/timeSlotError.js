@@ -1,32 +1,22 @@
-﻿document.getElementById('dateInput').onchange = function () {
-    if (this.valueAsDate < new Date(2023, 1, 1)) {
-        document.getElementById('dateError').textContent = 'Дата не може бути меншою за 1 січня 2023';
+﻿function validateInput(inputElementId, errorMessageId, minValue, maxValue) {
+    var inputValue = document.getElementById(inputElementId).value;
+    var errorMessage = document.getElementById(errorMessageId);
+
+    if (inputValue < minValue || inputValue > maxValue) {
+        errorMessage.style.display = "inline";
     } else {
-        document.getElementById('dateError').textContent = '';
+        errorMessage.style.display = "none";
     }
-};
+}
 
-document.getElementById('startTimeInput').onchange = function () {
-    var inputTime = this.value;
-    var minTime = "07:00";
-    var maxTime = "21:45";
+document.getElementById("dateInput").addEventListener("input", function () {
+    validateInput("dateInput", "dateError", "2023-01-01", Infinity); // Infinity використовується як maxValue, оскільки немає максимальної дати
+});
 
-    if (inputTime < minTime || inputTime > maxTime) {
-        document.getElementById('startTimeError').textContent = 'Час повинен бути між 07:00 та 21:45';
-    } else {
-        document.getElementById('startTimeError').textContent = '';
-    }
-};
+document.getElementById("startTimeInput").addEventListener("input", function () {
+    validateInput("startTimeInput", "startTimeError", "07:00", "21:45");
+});
 
-document.getElementById('endTimeInput').onchange = function () {
-    var inputTime = this.value;
-    var minTime = "07:15";
-    var maxTime = "22:00";
-
-    if (inputTime < minTime || inputTime > maxTime) {
-        document.getElementById('endTimeError').textContent = 'Час повинен бути між 07:15 та 22:00';
-    } else {
-        document.getElementById('endTimeError').textContent = '';
-    }
-};
-
+document.getElementById("endTimeInput").addEventListener("input", function () {
+    validateInput("endTimeInput", "endTimeError", "07:15", "22:00");
+});

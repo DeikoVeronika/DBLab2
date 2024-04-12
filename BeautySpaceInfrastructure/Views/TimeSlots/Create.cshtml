@@ -34,18 +34,18 @@
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
                 <input asp-for="Date" type="date" class="form-control" placeholder="dd.mm.yyyy" min="2023-01-01" id="dateInput" />
-                <span id="dateError" class="text-danger"></span>
+                <span id="dateError" class="text-danger" style="display: none;">Дата не може бути меншою за 1 січня 2023</span>
             </div>
             <div class="form-group">
                 <label asp-for="StartTime" class="control-label"></label>
-                <input type="time" asp-for="StartTime" class="form-control" id="startTimeInput" />
-                <span id="startTimeError" class="text-danger"></span>
+                <input type="time" asp-for="StartTime" class="form-control" id="startTimeInput" min="07:00" max="21:45" />
+                <span id="startTimeError" class="text-danger" style="display: none;">Час початку повинен бути між 07:00 та 21:45</span>
             </div>
 
             <div class="form-group">
                 <label asp-for="EndTime" class="control-label"></label>
-                <input type="time" asp-for="EndTime" class="form-control" id="endTimeInput" />
-                <span id="endTimeError" asp-validation-for="EndTime" class="text-danger"></span>
+                <input type="time" asp-for="EndTime" class="form-control" id="endTimeInput" min="07:15" max="22:00" />
+                <span id="endTimeError" asp-validation-for="EndTime" class="text-danger" style="display: none;">Час кінця повинен бути між 07:15 та 22:00</span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -84,19 +84,8 @@
         </script>
     }
 
-    <script>
-        document.getElementById('timeInput').onchange = function () {
-            var inputTime = this.value;
-            var minTime = "09:00";
-            var maxTime = "18:00";
 
-            if (inputTime < minTime || inputTime > maxTime) {
-                document.getElementById('timeError').textContent = 'Час повинен бути між 09:00 та 18:00';
-            } else {
-                document.getElementById('timeError').textContent = '';
-            }
-        };
-    </script>
+
 
     <script src="/js/timeSlotError.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
