@@ -98,66 +98,12 @@ body {
     border-radius: 5px;
 }
 
-    .userForm input[type="submit"]:hover {
-        border-radius: 5px;
-        color: #fff;
-        background-color: #333;
-    }
-
-/*.userForm {
-    margin-top: 25px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-
-
-.userForm h2 {
-    margin: 0 0 15px;
-    color: #333;
-    text-align: center;
-    text-transform: uppercase;
-}*/
-
-    /* Input Styles */
-/*.userFormInput input {
-    width: 100%;
-    padding: 10px 0;
-    font-size: 16px;
-    color: #333;
-    border: none;
-    border-bottom: 2px solid #333;
-    outline: none;
-    background: transparent;
-}
-
-.passwordInput {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 10px;
-    cursor: pointer;
-}
-
-.userForm input[type="submit"] {
-    display: inline-block;
-    background-color: #333;
-    color: #fff;
-    padding: 10px 20px;
-    font-size: 16px;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 .userForm input[type="submit"]:hover {
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #333;
-}*/
+    border-radius: 5px;
+    color: #fff;
+    background-color: #333;
+}
+
+
 
 
