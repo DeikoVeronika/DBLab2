@@ -5,7 +5,7 @@ namespace BeautySpaceInfrastructure.ViewModel
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Введіть електронну пошту клієнта")]
+        [Required(ErrorMessage = "Введіть електронну пошту")]
         [Display(Name = "Email")]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Невірний формат електронної пошти")]
         public string Email { get; set; }
