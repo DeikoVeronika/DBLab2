@@ -1,0 +1,102 @@
+﻿@model BeautySpaceInfrastructure.ViewModel.LoginViewModel
+
+@{
+    ViewData["Title"] = "Авторизація";
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+}
+
+@* <style>
+    /* Global Reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Material Symbols Outlined', sans-serif;
+    }
+
+    /* Body Styles */
+    body {
+        background-color: #f1f1f1;
+    }
+
+    /* Form Styles */
+    
+
+        .userForm label {
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Submit Button Styles */
+        
+
+            
+
+    /* Password Toggle Icon Styles */
+    .material-symbols-outlined {
+        font-size: 18px;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+</style> *@
+
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="userForm">
+            <h2 class="text-center mt-3">Авторизація</h2>
+
+                <form method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">
+                    <div asp-validation-summary="ModelOnly"></div>
+                    <div class="userFormContainer">
+                        <div class="userFormInput">
+                            <div>
+                                <label asp-for="Email"></label><br />
+                                <input asp-for="Email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Password"></label><br />
+                                <div style="position: relative;">
+                                    <input type="password" id="password" asp-for="Password" />
+                                    <i class="material-symbols-outlined passwordInput" onclick="showHidePassword()">visibility_off</i>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div style="display: flex; align-items: center;">
+                            <label style="margin-right: 5px;" asp-for="RememberMe"></label>
+                            <input asp-for="RememberMe" />
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" value="Увійти" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function showHidePassword() {
+            var x = document.getElementById("password");
+            var eyeIcon = document.querySelector(".material-symbols-outlined");
+            if (x.type === "password") {
+                x.type = "text";
+                eyeIcon.textContent = "visibility";
+            } else {
+                x.type = "password";
+                eyeIcon.textContent = "visibility_off";
+            }
+        }
+    </script>
+}
