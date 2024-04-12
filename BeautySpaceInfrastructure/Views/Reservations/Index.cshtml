@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Бронювання";
     DbbeautySpaceContext dbbeautySpaceContext = new DbbeautySpaceContext();
-
 }
 
 <h1>Створені бронювання</h1>
@@ -11,6 +10,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th class="table-name">
+                @Html.DisplayNameFor(model => model.TimeSlot.Date)
+            </th>
             <th class="table-name">
                 Ім'я клієнта
             </th>
@@ -37,6 +39,9 @@
         {
             <tr>
                 <td>
+                    @Html.DisplayFor(modelItem => item.TimeSlot.Date)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Client.FirstName)
                 </td>
                 <td>
@@ -51,18 +56,14 @@
 
                 <td>
                     @{
-
                         var employeeService = dbbeautySpaceContext.EmployeeServices.FirstOrDefault(es => es.Id == item.TimeSlot.EmployeeServiceId);
                         var employee = dbbeautySpaceContext.Employees.FirstOrDefault(e => e.Id == employeeService.EmployeeId);
-
                     }
                     @employee.FirstName @employee.LastName
                 </td>
                 <td>
                     @{
-
                         var service = dbbeautySpaceContext.Services.FirstOrDefault(s => s.Id == employeeService.ServiceId);
-
                     }
                     @service.Name
                 </td>
