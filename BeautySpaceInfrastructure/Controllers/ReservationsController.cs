@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BeautySpaceDomain.Model;
 using BeautySpaceInfrastructure;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace BeautySpaceInfrastructure.Controllers
 {
@@ -49,28 +50,28 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: Reservations/Create
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email");
-            ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Id");
+            ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text");
+            ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text");
             return View();
         }
 
-        // POST: Reservations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ClientId,Info,TimeSlotId,Id")] Reservation reservation)
         {
             if (ModelState.IsValid)
             {
+                reservation.Info = DateTime.Now.ToString("HH:mm:ss dd.MM.yyyy");
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email", reservation.ClientId);
-            ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Id", reservation.TimeSlotId);
+
+            ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservation.ClientId);
+            ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservation.TimeSlotId);
             return View(reservation);
         }
+
 
         // GET: Reservations/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -166,5 +167,48 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             return _context.Reservations.Any(e => e.Id == id);
         }
+
+        public static string FormatPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return phoneNumber;
+
+            // Переконуємось, що номер починається з "+38" і має потрібну довжину
+            if (phoneNumber.StartsWith("+38") && phoneNumber.Length == 13)
+            {
+                // Видаляємо "+38" для спрощення подальшого форматування
+                string localPart = phoneNumber.Substring(3);
+                return $"({localPart.Substring(0, 3)}) {localPart.Substring(3, 3)}-{localPart.Substring(6, 2)}-{localPart.Substring(8)}";
+            }
+            else
+            {
+                return phoneNumber; // Якщо формат невідомий або некоректний, повертаємо без змін
+            }
+        }
+
+        public List<SelectListItem> GetClientsSelectList()
+        {
+            return _context.Clients
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = FormatPhoneNumber(c.PhoneNumber)
+                })
+                .ToList();
+        }
+
+        public List<SelectListItem> GetTimeSlotsSelectList()
+        {
+            return _context.TimeSlots
+                .Select(ts => new SelectListItem
+                {
+                    Value = ts.Id.ToString(),
+                    Text = ts.Id.ToString() // При необхідності ви можете використовувати форматування для відображення часових слотів
+                })
+                .ToList();
+        }
+
+
+
     }
 }

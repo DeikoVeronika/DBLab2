@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Час для запису";
+    DbbeautySpaceContext dbbeautySpaceContext = new DbbeautySpaceContext();
+
 }
 
 <h1>Доступний час для запису</h1>
@@ -29,6 +31,7 @@
     </thead>
     <tbody>
     @foreach (var item in Model) {
+
                 <tr class="@(item.IsBooked ? "table-danger" : "")">
                 <td>
                     @Html.DisplayFor(modelItem => item.Date)
@@ -40,19 +43,15 @@
                     @Html.DisplayFor(modelItem => item.EndTime)
                 </td>
                 <td>
-                    @* @Html.DisplayFor(modelItem => item.EmployeeService.Id) *@
                     @{
-                        DbbeautySpaceContext dbbeautySpaceContextEmployeeFullName = new DbbeautySpaceContext();
-                        var employeeFullName = dbbeautySpaceContextEmployeeFullName.Employees.Find(item.EmployeeService.EmployeeId);
+                        var employeeFullName = dbbeautySpaceContext.Employees.Find(item.EmployeeService.EmployeeId);
                     }
                     @employeeFullName.FirstName @employeeFullName.LastName
 
                 </td>
                 <td>
-                    @* @Html.DisplayFor(modelItem => item.EmployeeService.Id) *@
                     @{
-                        DbbeautySpaceContext dbbeautySpaceContextServiceName = new DbbeautySpaceContext();
-                        var serviceName = dbbeautySpaceContextServiceName.Services.Find(item.EmployeeService.ServiceId);
+                        var serviceName = dbbeautySpaceContext.Services.Find(item.EmployeeService.ServiceId);
                     }
                     @serviceName.Name 
 

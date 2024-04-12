@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Бронювання";
+    DbbeautySpaceContext dbbeautySpaceContext = new DbbeautySpaceContext();
+
 }
 
 <h1>Створені бронювання</h1>
@@ -10,35 +12,66 @@
     <thead>
         <tr>
             <th class="table-name">
-                @Html.DisplayNameFor(model => model.Info)
+                Ім'я клієнта
             </th>
             <th class="table-name">
-                @Html.DisplayNameFor(model => model.Client)
+                Прізвище клієнта
             </th>
             <th class="table-name">
-                @Html.DisplayNameFor(model => model.TimeSlot)
+                Мобільний номер клієнта
+            </th>
+            <th class="table-name">
+                @Html.DisplayNameFor(model => model.TimeSlot.StartTime)
+            </th>
+            <th class="table-name">
+                Майстер
+            </th>
+            <th class="table-name">
+                Послуга
             </th>
             <th><a asp-action="Create">Створити нове бронювання</a></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Info)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeSlot.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.PhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeSlot.StartTime)
+                </td>
+
+                <td>
+                    @{
+
+                        var employeeService = dbbeautySpaceContext.EmployeeServices.FirstOrDefault(es => es.Id == item.TimeSlot.EmployeeServiceId);
+                        var employee = dbbeautySpaceContext.Employees.FirstOrDefault(e => e.Id == employeeService.EmployeeId);
+
+                    }
+                    @employee.FirstName @employee.LastName
+                </td>
+                <td>
+                    @{
+
+                        var service = dbbeautySpaceContext.Services.FirstOrDefault(s => s.Id == employeeService.ServiceId);
+
+                    }
+                    @service.Name
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
