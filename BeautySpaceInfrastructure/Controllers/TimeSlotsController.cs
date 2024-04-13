@@ -22,8 +22,13 @@ namespace BeautySpaceInfrastructure.Controllers
         // GET: TimeSlots
         public async Task<IActionResult> Index()
         {
-            var dbbeautySpaceContext = _context.TimeSlots.Include(t => t.EmployeeService);
+            var dbbeautySpaceContext = _context.TimeSlots
+            .Include(t => t.EmployeeService)
+            .OrderBy(t => t.Date)
+            .ThenBy(t => t.StartTime);
+
             return View(await dbbeautySpaceContext.ToListAsync());
+
         }
 
         // GET: TimeSlots/Details/5

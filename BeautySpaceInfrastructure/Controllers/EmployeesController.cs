@@ -39,14 +39,29 @@ namespace BeautySpaceInfrastructure.Controllers
 
             var employee = await _context.Employees
                 .Include(e => e.Position)
+                .Include(e => e.EmployeeServices)
+                    .ThenInclude(es => es.Service)
+                .Include(e => e.EmployeeServices)
+                    .ThenInclude(es => es.TimeSlots)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (employee == null)
             {
                 return NotFound();
             }
 
+            // Сортування слотів за датою та часом початку
+            foreach (var employeeService in employee.EmployeeServices)
+            {
+                employeeService.TimeSlots = employeeService.TimeSlots
+                    .OrderBy(t => t.Date)
+                    .ThenBy(t => t.StartTime)
+                    .ToList();
+            }
+
             return View(employee);
         }
+
 
         // GET: Employees/Create
         public IActionResult Create(int? positionId)
