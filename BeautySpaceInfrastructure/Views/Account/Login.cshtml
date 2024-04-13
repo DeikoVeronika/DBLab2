@@ -5,51 +5,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 }
 
-@* <style>
-    /* Global Reset */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Material Symbols Outlined', sans-serif;
-    }
-
-    /* Body Styles */
-    body {
-        background-color: #f1f1f1;
-    }
-
-    /* Form Styles */
-    
-
-        .userForm label {
-            font-size: 16px;
-            color: #333;
-        }
-
-        /* Submit Button Styles */
-        
-
-            
-
-    /* Password Toggle Icon Styles */
-    .material-symbols-outlined {
-        font-size: 18px;
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        cursor: pointer;
-    }
-</style> *@
-
-
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="userForm">
             <h2 class="text-center mt-3">Авторизація</h2>
 
-                <form method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">
+            <form method="post" asp-controller="Account" asp-action="Login">
+                <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
                     <div asp-validation-summary="ModelOnly"></div>
                     <div class="userFormContainer">
                         <div class="userFormInput">

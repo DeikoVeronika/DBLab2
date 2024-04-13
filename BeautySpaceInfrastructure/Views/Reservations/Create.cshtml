@@ -13,6 +13,9 @@
             <div class="form-group">
                 <label asp-for="ClientId" class="control-label"></label>
                 <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
+                <span id="clientIdError" class="text-danger" style="display: @(ViewData.ModelState.ContainsKey("ClientId") ? "inline" : "none")">
+                    @Html.ValidationMessageFor(model => model.ClientId, "", new { @class = "text-danger" })
+                </span>
             </div>
             <div class="form-group">
                 <label asp-for="TimeSlotId" class="control-label"></label>

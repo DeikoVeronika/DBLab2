@@ -61,9 +61,32 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Перевірка на існування ідентичного бронювання
+                var existingReservation = await _context.Reservations
+                    .FirstOrDefaultAsync(r => r.ClientId == reservation.ClientId && r.TimeSlotId == reservation.TimeSlotId);
+
+                if (existingReservation != null)
+                {
+                    ModelState.AddModelError("ClientId", "Таке бронювання для цього клієнта вже існує.");
+                    ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservation.ClientId);
+                    ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservation.TimeSlotId);
+                    return View(reservation);
+                }
+
                 reservation.Info = DateTime.Now.ToString("HH:mm:ss dd.MM.yyyy");
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
+
+                // Отримати вибраний TimeSlot
+                var selectedTimeSlot = await _context.TimeSlots.FindAsync(reservation.TimeSlotId);
+
+                if (selectedTimeSlot != null)
+                {
+                    // Позначити TimeSlot як заброньований
+                    selectedTimeSlot.IsBooked = true;
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -71,6 +94,8 @@ namespace BeautySpaceInfrastructure.Controllers
             ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservation.TimeSlotId);
             return View(reservation);
         }
+
+
 
 
         // GET: Reservations/Edit/5
@@ -154,14 +179,24 @@ namespace BeautySpaceInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var reservation = await _context.Reservations.FindAsync(id);
-            if (reservation != null)
+            if (reservation == null)
             {
-                _context.Reservations.Remove(reservation);
+                return NotFound();
             }
 
+            // Знайти відповідний часовий слот і оновити його властивість IsBooked
+            var timeSlot = await _context.TimeSlots.FindAsync(reservation.TimeSlotId);
+            if (timeSlot != null)
+            {
+                timeSlot.IsBooked = false; // Позначити часовий слот як не заброньований
+            }
+
+            _context.Reservations.Remove(reservation);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool ReservationExists(int id)
         {
@@ -199,16 +234,18 @@ namespace BeautySpaceInfrastructure.Controllers
 
         public List<SelectListItem> GetTimeSlotsSelectList()
         {
-            return _context.TimeSlots
-                .Select(ts => new SelectListItem
-                {
-                    Value = ts.Id.ToString(),
-                    Text = ts.Id.ToString() // При необхідності ви можете використовувати форматування для відображення часових слотів
-                })
-                .ToList();
+            // Отримати тільки ті TimeSlot, які позначені як false
+            var timeSlots = _context.TimeSlots.Where(ts => !ts.IsBooked).ToList();
+
+            // Створити список SelectListItem з цих TimeSlot
+            var selectList = timeSlots.Select(ts => new SelectListItem
+            {
+                Value = ts.Id.ToString(),
+                Text = ts.Id.ToString() // При необхідності ви можете використовувати форматування для відображення часових слотів
+            }).ToList();
+
+            return selectList;
         }
-
-
 
     }
 }
