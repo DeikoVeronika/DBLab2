@@ -48,7 +48,10 @@
                     @Html.DisplayFor(modelItem => item.Client.LastName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Client.PhoneNumber)
+                    @if (!string.IsNullOrEmpty(item.Client.PhoneNumber))
+                    {
+                        <text>(@item.Client.PhoneNumber.Substring(3, 3)) @item.Client.PhoneNumber.Substring(6, 3)-@item.Client.PhoneNumber.Substring(9, 2)-@item.Client.PhoneNumber.Substring(11)</text>
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TimeSlot.StartTime)

@@ -43,7 +43,8 @@
             <div class="form-group">
                 <label asp-for="EndTime" class="control-label"></label>
                 <input type="time" asp-for="EndTime" class="form-control" id="endTimeInput" min="07:15" max="22:00" />
-                <span id="endTimeError" asp-validation-for="EndTime" class="text-danger" style="display: none;">Час кінця повинен бути між 07:15 та 22:00</span>
+                <span id="endTimeError" asp-validation-for="EndTime" class="text-danger" style="display: none;">Час кінця повинен бути між 07:15 та 22:00.</span>
+                <span id="minServiceEndTimeError" asp-validation-for="EndTime" class="text-danger" style="display: none;">Мінімальний час послуги 15хв</span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">

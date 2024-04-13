@@ -35,7 +35,16 @@ namespace BeautySpaceInfrastructure.Controllers
             }
 
             var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.Id == id);
+            .Include(c => c.Reservations)
+                .ThenInclude(r => r.TimeSlot)
+                    .ThenInclude(ts => ts.EmployeeService)
+                        .ThenInclude(es => es.Service)
+            .Include(c => c.Reservations)
+                .ThenInclude(r => r.TimeSlot)
+                    .ThenInclude(ts => ts.EmployeeService)
+                        .ThenInclude(es => es.Employee)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
             if (client == null)
             {
                 return NotFound();
@@ -43,6 +52,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
             return View(client);
         }
+
 
         // GET: Clients/Create
         public IActionResult Create()
