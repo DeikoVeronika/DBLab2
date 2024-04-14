@@ -56,26 +56,24 @@
 <div class="employee-timeSlot">
     <hr />
     <h3>Графік майстра</h3>
-    @foreach (var service in Model.EmployeeServices)
-    {
-
-        @if (service.TimeSlots.Any())
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Початок</th>
-                        <th>Кінець</th>
-                        <th>Послуга</th>
-                        <th>
-                            <a asp-controller="TimeSlots" asp-action="Create">Створити новий час для запису</a>
-                        </th>
-
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var slot in service.TimeSlots)
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Початок</th>
+                <th>Кінець</th>
+                <th>Послуга</th>
+                <th>
+                    <a asp-controller="TimeSlots" asp-action="Create">Створити новий час для запису</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var service in Model.EmployeeServices)
+            {
+                if (service.TimeSlots.Any())
+                {
+                    foreach (var slot in service.TimeSlots)
                     {
                         <tr class="@(slot.IsBooked ? "table-danger" : "")">
                             <td>@slot.Date</td>
@@ -83,15 +81,16 @@
                             <td>@slot.EndTime</td>
                             <td>@service.Service.Name</td>
                             <td>
-                                <a asp-controller="TimeSlots" asp-controller="TimeSlots" asp-action="Edit" asp-route-id="@slot.Id">Редагувати</a> |
+                                <a asp-controller="TimeSlots" asp-action="Edit" asp-route-id="@slot.Id">Редагувати</a> |
                                 <a asp-controller="TimeSlots" asp-action="Details" asp-route-id="@slot.Id">Деталі</a> |
                                 <a asp-controller="TimeSlots" asp-action="Delete" asp-route-id="@slot.Id">Видалити</a>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        }
-    }
+                }
+            }
+        </tbody>
+    </table>
+
 
 </div>

@@ -1,13 +1,11 @@
 ﻿@model BeautySpaceDomain.Model.Client
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Інформація клієнта";
 }
 
-<h1>Details</h1>
-
 <div>
-    <h4>Client</h4>
+    <h4>Інформація клієнта</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -82,6 +80,6 @@
 
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані клієнта</a> |
     <a asp-action="Index">Назад</a>
 </div>
