@@ -1,13 +1,12 @@
 ﻿@model BeautySpaceDomain.Model.Category
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі категорії";
 }
 
-<h1>Details</h1>
 
 <div>
-    <h4>Category</h4>
+    <h4>Деталі категорії</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -19,6 +18,10 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    @if (Accessibility.AllExceptUser(User))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+    }
+    |
     <a asp-action="Index">Назад</a>
 </div>

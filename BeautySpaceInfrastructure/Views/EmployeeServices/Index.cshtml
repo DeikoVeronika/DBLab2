@@ -13,7 +13,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.Employee)
             </th>
-            <th>@Html.ActionLink("Додати працівника до послуги", "Create", new { serviceId = ViewBag.ServiceId })</th>
+            <th>
+                @if (Accessibility.AllExceptUser(User))
+                    {
+                        @Html.ActionLink("Додати працівника до послуги", "Create", new { serviceId = ViewBag.ServiceId })
+                    }
+                </th>
         </tr>
     </thead>
     <tbody>
@@ -25,9 +30,12 @@
             </td>
             <td>
  @*                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> | *@
-                <a asp-action="Details" asp-route-id="@item.Id">Графік працівника</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Графік працівника</a>
+                    @if (Accessibility.AllExceptUser(User))
+                    {
+                    <a asp-action = "Delete" asp-route-id = "@item.Id" > Видалити </a>
+                    }
+                </td>
         </tr>
 }
     </tbody>

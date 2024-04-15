@@ -1,13 +1,12 @@
 ﻿@model BeautySpaceDomain.Model.TimeSlot
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі timeslot";
 }
 
-<h1>Details</h1>
 
 <div>
-    <h4>TimeSlot</h4>
+    <h4>Деталі timeslot</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -43,6 +42,9 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    @if (Accessibility.AllExceptUser(User))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+    }
     <a asp-action="Index">Назад</a>
 </div>

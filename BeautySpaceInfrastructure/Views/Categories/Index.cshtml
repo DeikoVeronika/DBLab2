@@ -15,7 +15,11 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                <a asp-action="Create">Створити нову категорію</a>
+                @if (Accessibility.AllExceptUser(User))
+                {
+                    <a asp-action="Create">Створити нову категорію</a>
+                }
+
             </th>
         </tr>
     </thead>
@@ -26,19 +30,27 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Переглянути послуги</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+             <a asp-action="Details" asp-route-id="@item.Id">Переглянути послуги</a>
+
+            @if (Accessibility.AllExceptUser(User))
+            {
+                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> 
                 <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+            }
             </td>
         </tr>
 }
     </tbody>
 </table>
 
-<div style="display:flex; justify-content:space-around;">
-    <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Import">Завантажити з файлу</a>
-    <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Export">Експортувати у файл</a>
-</div>
+@if (Accessibility.AllExceptUser(User))
+{
+    <div style="display:flex; justify-content:space-around;">
+        <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Import">Завантажити з файлу</a>
+        <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Export">Експортувати у файл</a>
+    </div>
+}
+
 
 
 

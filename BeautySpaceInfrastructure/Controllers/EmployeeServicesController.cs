@@ -49,7 +49,7 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
-            return View(employeeService);
+            return RedirectToAction("Details", "Employees", new { id = employeeService.EmployeeId });
         }
 
         // GET: EmployeeServices/Create

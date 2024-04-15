@@ -31,7 +31,9 @@
             <th class="table-name">
                 Послуга
             </th>
-            <th><a asp-action="Create">Створити нове бронювання</a></th>
+            <th>
+                <a asp-action="Create">Створити нове бронювання</a>
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -71,9 +73,12 @@
                     @service.Name
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    @if (Accessibility.AllExceptUser(User))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> 
                 </td>
             </tr>
         }

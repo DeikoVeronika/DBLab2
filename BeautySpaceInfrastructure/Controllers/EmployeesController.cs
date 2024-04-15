@@ -80,17 +80,13 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             employee.EmployeePortrait = await ProcessImageAsync(employeePortrait);
 
-            employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
+            employee.PhoneNumber = NormalizePhoneNumber(employee.PhoneNumber);
 
-
-            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber && s.Id != employee.Id);
-
-            if (existingEmployee != null)
+            // Виклик методу для перевірки наявності працівника з таким номером телефону
+            var existingEmployeeResult = CheckExistingEmployeeByPhoneNumber(employee);
+            if (existingEmployeeResult != null)
             {
-                ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
-                var positions = _context.Positions.OrderBy(p => p.Name).ToList();
-                ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
-                return View(employee);
+                return existingEmployeeResult;
             }
 
             _context.Add(employee);
@@ -149,8 +145,14 @@ namespace BeautySpaceInfrastructure.Controllers
                 employee.EmployeePortrait = existingEmployee.EmployeePortrait;
             }
 
-            employee.PhoneNumber = "+" + new string(employee.PhoneNumber.Where(c => char.IsDigit(c)).ToArray());
+            employee.PhoneNumber = NormalizePhoneNumber(employee.PhoneNumber);
 
+            // Виклик методу для перевірки наявності працівника з таким номером телефону
+            var existingEmployeeResult = CheckExistingEmployeeByPhoneNumber(employee);
+            if (existingEmployeeResult != null)
+            {
+                return existingEmployeeResult;
+            }
 
             // Оновлення і збереження працівника
             _context.Entry(existingEmployee).CurrentValues.SetValues(employee);
@@ -207,6 +209,11 @@ namespace BeautySpaceInfrastructure.Controllers
             return _context.Employees.Any(e => e.Id == id);
         }
 
+        private string NormalizePhoneNumber(string phoneNumber)
+        {
+            return "+" + new string(phoneNumber.Where(c => char.IsDigit(c)).ToArray());
+        }
+
         public async Task<byte[]> ProcessImageAsync(IFormFile imageFile)
         {
             if (imageFile != null && imageFile.Length > 0)
@@ -230,6 +237,22 @@ namespace BeautySpaceInfrastructure.Controllers
                 }
             }
         }
+
+        private IActionResult CheckExistingEmployeeByPhoneNumber(Employee employee)
+        {
+            var existingEmployee = _context.Employees.FirstOrDefault(s => s.PhoneNumber == employee.PhoneNumber && s.Id != employee.Id);
+
+            if (existingEmployee != null)
+            {
+                ModelState.AddModelError("PhoneNumber", "Працівник з таким номером телефону вже існує");
+                var positions = _context.Positions.OrderBy(p => p.Name).ToList();
+                ViewBag.PositionId = new SelectList(positions, "Id", "Name", employee.PositionId);
+                return View(employee);
+            }
+
+            return null;
+        }
+
 
     }
 }

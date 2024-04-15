@@ -22,6 +22,30 @@ namespace BeautySpaceInfrastructure.Controllers
             return View();
         }
         [HttpPost]
+        //public async Task<IActionResult> Register(RegisterViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        User user = new User { Email = model.Email, UserName = model.Email };
+        //        // додаємо користувача
+        //        var result = await _userManager.CreateAsync(user, model.Password);
+        //        if (result.Succeeded)
+        //        {
+        //            // установка кукі
+        //            await _signInManager.SignInAsync(user, false);
+        //            return RedirectToAction("Index", "Home");
+        //        }
+        //        else
+        //        {
+        //            foreach (var error in result.Errors)
+        //            {
+        //                ModelState.AddModelError(string.Empty, error.Description);
+        //            }
+        //        }
+        //    }
+        //    return View(model);
+        //}
+
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)

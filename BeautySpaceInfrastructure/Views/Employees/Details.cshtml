@@ -27,10 +27,19 @@
         <tr>
             <th>Послуги</th>
             <td>
-                @foreach (var service in Model.EmployeeServices)
+                @{
+                    //sort services
+
+                    var sortedServices = Model.EmployeeServices;//.OrderBy(es => es.TimeSlots.OrderBy(ts => ts.Date).ThenBy(ts => ts.StartTime))
+                     
+                }
+
+                @foreach (var service in sortedServices)
                 {
                     <p>@service.Service.Name</p>
                 }
+
+
             </td>
         </tr>
     </table>
@@ -48,7 +57,10 @@
     </div>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані працівника</a> |
+    @if (Accessibility.AllExceptUser(User))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані працівника</a>
+    }
     <a asp-action="Index">Назад</a>
 </div>
 
@@ -64,7 +76,10 @@
                 <th>Кінець</th>
                 <th>Послуга</th>
                 <th>
-                    <a asp-controller="TimeSlots" asp-action="Create">Створити новий час для запису</a>
+                    @if (Accessibility.AllExceptUser(User))
+                    {
+                        <a asp-controller="TimeSlots" asp-action="Create">Створити новий час для запису</a>
+                    }
                 </th>
             </tr>
         </thead>
@@ -81,9 +96,12 @@
                             <td>@slot.EndTime</td>
                             <td>@service.Service.Name</td>
                             <td>
-                                <a asp-controller="TimeSlots" asp-action="Edit" asp-route-id="@slot.Id">Редагувати</a> |
-                                <a asp-controller="TimeSlots" asp-action="Details" asp-route-id="@slot.Id">Деталі</a> |
-                                <a asp-controller="TimeSlots" asp-action="Delete" asp-route-id="@slot.Id">Видалити</a>
+                                @if (Accessibility.AllExceptUser(User))
+                                {
+                                    <a asp-controller="TimeSlots" asp-action="Edit" asp-route-id="@slot.Id">Редагувати</a>
+                                    <a asp-controller="TimeSlots" asp-action="Delete" asp-route-id="@slot.Id">Видалити</a>
+                                }
+                                <a asp-controller="TimeSlots" asp-action="Details" asp-route-id="@slot.Id">Деталі</a> 
                             </td>
                         </tr>
                     }
