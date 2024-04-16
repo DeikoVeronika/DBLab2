@@ -24,7 +24,7 @@ public partial class Service : Entity
     [RegularExpression(@"^.*[0-9].*$", ErrorMessage = "Ціна повинна містити лише цифри ")]
     [Range(0, 100000, ErrorMessage = "Ціна не може бути від'ємною та більшою за 100000")]
     [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
-    [Display(Name = "Ціна")]
+    [Display(Name = "Ціна ₴")]
     public decimal Price { get; set; }
 
     [Display(Name = "Категорія")]

@@ -90,6 +90,10 @@
                 {
                     foreach (var slot in service.TimeSlots)
                     {
+                        if (slot.IsBooked && !Accessibility.AllExceptUser(User))
+                        {
+                            continue;
+                        }
                         <tr class="@(slot.IsBooked ? "table-danger" : "")">
                             <td>@slot.Date</td>
                             <td>@slot.StartTime</td>
