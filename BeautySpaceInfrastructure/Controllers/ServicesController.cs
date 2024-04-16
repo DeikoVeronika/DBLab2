@@ -163,22 +163,27 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var service = await _context.Services.Include(s => s.EmployeeServices).ThenInclude(es => es.TimeSlots).FirstOrDefaultAsync(s => s.Id == id);
+            var service = await _context.Services
+                .Include(s => s.EmployeeServices)
+                .ThenInclude(es => es.TimeSlots)
+                .ThenInclude(ts => ts.Reservations)
+                .FirstOrDefaultAsync(s => s.Id == id);  
+
             var categoryId = service.CategoryId;
 
-            // Видалити всі TimeSlots, пов'язані з EmployeeServices цієї послуги
-            foreach (var employeeService in service.EmployeeServices)
+           if (service !=null)
             {
-                _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+                foreach (var employeeService in service.EmployeeServices)
+                {
+                    _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+                }
+
+                _context.EmployeeServices.RemoveRange(service.EmployeeServices);
+                _context.Services.Remove(service);
+
+                await _context.SaveChangesAsync();
             }
 
-            // Видалити всі EmployeeServices пов'язані з цією послугою
-            _context.EmployeeServices.RemoveRange(service.EmployeeServices);
-
-            // Видалити послугу
-            _context.Services.Remove(service);
-
-            await _context.SaveChangesAsync();
             return RedirectToAction("Details", "Categories", new { id = categoryId });
         }
 
@@ -200,6 +205,28 @@ namespace BeautySpaceInfrastructure.Controllers
             }
             return 0;
         }
+
+        [HttpGet]
+        public async Task<bool> CheckReservations(int serviceId)
+        {
+            var service = await _context.Services.Include(s => s.EmployeeServices).ThenInclude(es => es.TimeSlots).ThenInclude(ts => ts.Reservations).FirstOrDefaultAsync(s => s.Id == serviceId);
+            if (service != null)
+            {
+                foreach (var employeeService in service.EmployeeServices)
+                {
+                    foreach (var timeSlot in employeeService.TimeSlots)
+                    {
+                        if (timeSlot.Reservations.Any())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
 
     }
 }

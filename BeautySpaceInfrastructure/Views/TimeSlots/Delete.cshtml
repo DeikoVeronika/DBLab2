@@ -40,9 +40,35 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form asp-action="Delete" id="deleteForm">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Видалити" class="btn btn-danger" /> |
         <a asp-action="Index">Назад</a>
     </form>
+    <button class="btn btn-danger" onclick="confirmDelete()">Видалити</button>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete() {
+            $.ajax({
+                url: '/TimeSlots/CheckReservations', 
+                type: 'GET',
+                data: { timeSlotId: @Model.Id }, 
+                success: function (hasReservations) {
+                    if (hasReservations) {
+                        Swal.fire({
+                            title: 'Помилка',
+                            text: "Не можна видалити TimeSlot якщо до нього прив'язані бронювання.",
+                            icon: 'error',
+                            confirmButtonColor: '#ab0c24',
+                            confirmButtonText: 'OK'
+                        })
+                    } else {
+                        document.getElementById('deleteForm').submit();
+                    }
+                }
+            });
+        }
+    </script>
+}

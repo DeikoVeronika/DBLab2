@@ -47,30 +47,48 @@
     <script>
         function confirmDelete() {
             $.ajax({
-                url: '/EmployeeServices/GetEmployeeServiceCount', // Змініть URL на відповідний
+                url: '/Services/CheckReservations', 
                 type: 'GET',
-                data: { serviceId: @Model.Id }, // Змініть параметр на відповідний
-                success: function (employeeServiceCount) {
-                    if (employeeServiceCount > 0) {
+                data: { serviceId: @Model.Id }, 
+                success: function (hasReservations) {
+                    if (hasReservations) {
                         Swal.fire({
-                            title: 'Ви впевнені?',
-                            text: "Якщо ви видалите цю послугу, всі працівники цієї послуги, їхні таймслоти та бронювання будуть втрачені.",
-                            icon: 'warning',
-                            showCancelButton: true,
+                            title: 'Помилка',
+                            text: "Не можна видалити послугу якщо до неї прив'язані бронювання.",
+                            icon: 'error',
                             confirmButtonColor: '#ab0c24',
-                            cancelButtonColor: '#6d6d6d',
-                            confirmButtonText: 'Видалити послугу',
-                            cancelButtonText: 'Cкасувати видалення'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                document.getElementById('deleteForm').submit();
-                            }
+                            confirmButtonText: 'OK'
                         })
                     } else {
-                        document.getElementById('deleteForm').submit();
+                        $.ajax({
+                            url: '/EmployeeServices/GetEmployeeServiceCount', 
+                            type: 'GET',
+                            data: { serviceId: @Model.Id },
+                            success: function (employeeServiceCount) {
+                                if (employeeServiceCount > 0) {
+                                    Swal.fire({
+                                        title: 'Ви впевнені?',
+                                        text: "Якщо ви видалите цю послугу, всі працівники цієї послуги та їхні таймслоти будуть втрачені.",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#ab0c24',
+                                        cancelButtonColor: '#6d6d6d',
+                                        confirmButtonText: 'Видалити послугу',
+                                        cancelButtonText: 'Cкасувати видалення'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            document.getElementById('deleteForm').submit();
+                                        }
+                                    })
+                                } else {
+                                    document.getElementById('deleteForm').submit();
+                                }
+                            }
+                        });
                     }
                 }
             });
         }
+
     </script>
 }

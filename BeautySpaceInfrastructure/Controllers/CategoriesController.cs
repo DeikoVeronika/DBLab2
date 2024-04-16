@@ -159,29 +159,21 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.Include(c => c.Services).ThenInclude(s => s.EmployeeServices).ThenInclude(es => es.TimeSlots).FirstOrDefaultAsync(c => c.Id == id);
-            if (category != null)
+            var service = await _context.Services
+                .Include(s => s.EmployeeServices)
+                .ThenInclude(es => es.TimeSlots)
+                .ThenInclude(ts => ts.Reservations)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (service != null)
             {
-                // Видалити всі TimeSlots, пов'язані з EmployeeServices цієї категорії
-                foreach (var service in category.Services)
+                foreach (var employeeService in service.EmployeeServices)
                 {
-                    foreach (var employeeService in service.EmployeeServices)
-                    {
-                        _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
-                    }
+                    _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
                 }
+                _context.EmployeeServices.RemoveRange(service.EmployeeServices);
+                _context.Services.Remove(service);
 
-                // Видалити всі EmployeeServices, пов'язані з послугами цієї категорії
-                foreach (var service in category.Services)
-                {
-                    _context.EmployeeServices.RemoveRange(service.EmployeeServices);
-                }
-
-                // Видалити всі послуги пов'язані з категорією
-                _context.Services.RemoveRange(category.Services);
-
-                // Видалити категорію
-                _context.Categories.Remove(category);
                 await _context.SaveChangesAsync();
             }
 
@@ -252,6 +244,30 @@ namespace BeautySpaceInfrastructure.Controllers
             {
                 FileDownloadName = $"categories_{DateTime.UtcNow.ToShortDateString()}.xlsx"
             };
+        }
+
+        [HttpGet]
+        public async Task<bool> CheckReservations(int categoryId)
+        {
+            var category = await _context.Categories.Include(c => c.Services).ThenInclude(s => s.EmployeeServices).ThenInclude(es => es.TimeSlots).ThenInclude(ts => ts.Reservations).FirstOrDefaultAsync(c => c.Id == categoryId);
+            if (category != null)
+            {
+                foreach (var service in category.Services)
+                {
+                    foreach (var employeeService in service.EmployeeServices)
+                    {
+                        foreach (var timeSlot in employeeService.TimeSlots)
+                        {
+                            if (timeSlot.Reservations.Any())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

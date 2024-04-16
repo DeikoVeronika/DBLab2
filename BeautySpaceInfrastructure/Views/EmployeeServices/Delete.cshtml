@@ -37,27 +37,44 @@
     <script>
         function confirmDelete() {
             $.ajax({
-                url: '/TimeSlots/GetTimeSlotCount', // Змініть URL на відповідний
+                url: '/EmployeeServices/CheckReservations', 
                 type: 'GET',
-                data: { employeeServiceId: @Model.Id }, // Змініть параметр на відповідний
-                success: function (timeSlotCount) {
-                    if (timeSlotCount > 0) {
+                data: { employeeServiceId: @Model.Id }, 
+                success: function (hasReservations) {
+                    if (hasReservations) {
                         Swal.fire({
-                            title: 'Ви впевнені?',
-                            text: "Якщо ви видалите працівника цієї послуги, всі його таймслоти та бронювання будуть втрачені.",
-                            icon: 'warning',
-                            showCancelButton: true,
+                            title: 'Помилка',
+                            text: "Не можна видалити працівника, якщо до нього прив'язані бронювання.",
+                            icon: 'error',
                             confirmButtonColor: '#ab0c24',
-                            cancelButtonColor: '#6d6d6d',
-                            confirmButtonText: 'Видалити EmployeeService',
-                            cancelButtonText: 'Cкасувати видалення'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                document.getElementById('deleteForm').submit();
-                            }
+                            confirmButtonText: 'OK'
                         })
                     } else {
-                        document.getElementById('deleteForm').submit();
+                        $.ajax({
+                            url: '/TimeSlots/GetTimeSlotCount',
+                            type: 'GET',
+                            data: { employeeServiceId: @Model.Id }, 
+                            success: function (timeSlotCount) {
+                                if (timeSlotCount > 0) {
+                                    Swal.fire({
+                                        title: 'Ви впевнені?',
+                                        text: "Якщо ви видалите працівника цієї послуги, всі його таймслоти будуть втрачені.",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#ab0c24',
+                                        cancelButtonColor: '#6d6d6d',
+                                        confirmButtonText: 'Видалити EmployeeService',
+                                        cancelButtonText: 'Cкасувати видалення'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            document.getElementById('deleteForm').submit();
+                                        }
+                                    })
+                                } else {
+                                    document.getElementById('deleteForm').submit();
+                                }
+                            }
+                        });
                     }
                 }
             });

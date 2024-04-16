@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BeautySpaceDomain.Model;
 using BeautySpaceInfrastructure;
+using BeautySpaceInfrastructure.Models;
 
 namespace BeautySpaceInfrastructure.Controllers
 {
@@ -227,7 +228,11 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var timeSlot = await _context.TimeSlots.FindAsync(id);
+            var timeSlot = await _context.TimeSlots
+                .Include(ts => ts.Reservations)
+                .FirstOrDefaultAsync(ts => ts.Id == id);
+
+
             if (timeSlot != null)
             {
                 _context.TimeSlots.Remove(timeSlot);
@@ -236,6 +241,7 @@ namespace BeautySpaceInfrastructure.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool TimeSlotExists(int id)
         {
@@ -338,6 +344,22 @@ namespace BeautySpaceInfrastructure.Controllers
             }
             return Ok(employeeService.TimeSlots.Count);
         }
+
+        [HttpGet]
+        public async Task<bool> CheckReservations(int timeSlotId)
+        {
+            var timeSlot = await _context.TimeSlots.Include(ts => ts.Reservations).FirstOrDefaultAsync(ts => ts.Id == timeSlotId);
+            if (timeSlot != null)
+            {
+                if (timeSlot.Reservations.Any())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
 
     }

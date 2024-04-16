@@ -178,10 +178,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
             if (employeeService != null)
             {
-                // Видалити всі TimeSlots, пов'язані з цим EmployeeService
                 _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
-
-                // Видалити EmployeeService
                 _context.EmployeeServices.Remove(employeeService);
             }
 
@@ -204,6 +201,24 @@ namespace BeautySpaceInfrastructure.Controllers
         private bool EmployeeServiceExists(int id)
         {
             return _context.EmployeeServices.Any(e => e.Id == id);
+        }
+
+        [HttpGet]
+        public async Task<bool> CheckReservations(int employeeServiceId)
+        {
+            var employeeService = await _context.EmployeeServices.Include(es => es.TimeSlots).ThenInclude(ts => ts.Reservations).FirstOrDefaultAsync(es => es.Id == employeeServiceId);
+            if (employeeService != null)
+            {
+                foreach (var timeSlot in employeeService.TimeSlots)
+                {
+                    if (timeSlot.Reservations.Any())
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

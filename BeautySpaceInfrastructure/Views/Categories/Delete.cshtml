@@ -34,25 +34,43 @@
                 data: { categoryId: @Model.Id },
                 success: function (servicesCount) {
                     if (servicesCount > 0) {
-                        Swal.fire({
-                            title: 'Підтвердження видалення',
-                            text: "Якщо ви видалите цю категорію всі послуги, працівники цієї послуги, їхні таймслоти та бронювання будуть втрачені.",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ab0c24',
-                            cancelButtonColor: '#6d6d6d',
-                            confirmButtonText: 'Видалити категорію',
-                            cancelButtonText: 'Cкасувати видалення'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                document.getElementById('deleteForm').submit();
+                        $.ajax({
+                            url: '/Categories/CheckReservations',
+                            type: 'GET',
+                            data: { categoryId: @Model.Id },
+                            success: function (hasReservations) {
+                                if (hasReservations) {
+                                    Swal.fire({
+                                        title: 'Помилка',
+                                        text: "Не можна видалити категорію якщо до неї прив'язані бронювання.",
+                                        icon: 'error',
+                                        confirmButtonColor: '#ab0c24',
+                                        confirmButtonText: 'OK'
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        title: 'Підтвердження видалення',
+                                        text: "Якщо ви видалите цю категорію всі послуги, працівники цієї послуги та їхні таймслоти будуть втрачені.",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#ab0c24',
+                                        cancelButtonColor: '#6d6d6d',
+                                        confirmButtonText: 'Видалити категорію',
+                                        cancelButtonText: 'Cкасувати видалення'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            document.getElementById('deleteForm').submit();
+                                        }
+                                    })
+                                }
                             }
-                        })
+                        });
                     } else {
                         document.getElementById('deleteForm').submit();
                     }
                 }
             });
         }
+
     </script>
 }
