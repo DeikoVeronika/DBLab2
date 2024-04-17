@@ -21,6 +21,94 @@ body {
   margin-bottom: 60px;
 }
 
+a {
+    text-decoration: none;
+}
+
+.content {
+    padding-top: 70px; 
+}
+
+
+/*start nav*/
+.navigation-bar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar {
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+
+}
+
+/*end nav*/
+
+
+/*start logout*/
+.material-icons-outlined {
+    font-family: 'Material Icons Outlined';
+    font-size: 24px;
+    color: #343a40 !important;
+    vertical-align: middle;
+    cursor: pointer;
+}
+/*end logout*/
+
+
+/*start buttons*/
+.btn.btn-outline-primary, .btn.btn-danger:hover {
+    text-decoration: none;
+    border: none;
+}
+
+.btn-back-new {
+    padding: 12px 24px;
+    border: 2px solid white;
+    transition: border-color 0.2s ease;
+}
+
+.btn-new {
+    transition: border-color 0.2s ease;
+    padding: 12px 24px;
+}
+
+.btn-back-new:hover {
+    border-color: black;
+}
+
+.btn-new:hover {
+    border: 1px solid black;
+}
+
+.btn-primary:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+/*end buttons*/
+.actions a {
+    padding: 5px 10px;
+    border-radius: 2px;
+    transition: background-color 0.1s ease;
+}
+
+.actions a:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Black with 30% opacity */
+}
+
+div.edit-create-or-back {
+    margin-top: 15px;
+}
+
+div.delete-or-back {
+    display: flex;
+    margin-top: 15px;
+    gap: 20px;
+}
+
+
 /* start employee card*/
 .employee-card-container {
     display: flex;
@@ -113,3 +201,37 @@ body {
     grid-template-columns: repeat(2, 1fr);
 }
 
+
+
+/*start home page*/
+.content, .about-us-wrapper {
+    margin-top: 50px;
+}
+
+.carousel-item {
+    height: 600px;
+    object-fit: cover;
+}
+
+.gallery-home {
+    margin-top: 25px;
+    margin-bottom: 100px;
+}
+
+.carousel-indicators li {
+    width: 10px;
+    height: 10px;
+    list-style-type: none;
+}
+
+h2 {
+    text-transform: uppercase;
+    margin-bottom: 19px;
+}
+
+.about-us-main-wrapper p {
+    letter-spacing: .1px;
+    font-size: 17px;
+    max-width: 940px;
+}
+/*end home page*/

@@ -4,56 +4,114 @@
     ViewData["Title"] = "Клієнти";
 }
 
-<h1>Список клієнтів</h1>
+<div class="content">
+    <h1>Список клієнтів</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.PhoneNumber)
-            </th>
-            <th class="table-name">
-                Дата народження
-            </th>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th><a asp-action="Create">Створити нового клієнта</a> </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.PhoneNumber))
-                {
-                    <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
-                }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Birthday)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.LastName)
+                </th>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </th>
+                <th class="table-name">
+                    Дата народження
+                </th>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    <a class="btn-new" asp-action="Create">Створити нового клієнта</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                        {
+                            <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Birthday)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                            <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div style="margin-top: 40px;">
+        <div id="ReservationChart"></div>
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            $.get('/api/Charts/JsonDataReservation')
+                .done(function (jsonData) {
+                    var data = google.visualization.arrayToDataTable(jsonData, false);
+
+                    // Calculate chart height based on data rows.
+                    var chartHeight = data.getNumberOfRows() * 60;
+
+                    var options = {
+                        title: "Кількість бронювань клієнта",
+                        width: 1000,
+                        height: chartHeight,
+                        colors: ['#dacdd2'],
+                        vAxis: { format: '0' },
+                        hAxis: { format: '0', minValue: 0, maxValue: Math.ceil(data.getColumnRange(1).max) },
+                        legend: 'none'
+                    };
+
+                    // Sort data by number of reservations.
+                    var sortedData = google.visualization.data.group(
+                        data,
+                        [0],
+                        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' }]
+                    );
+                    sortedData.sort({ column: 1, desc: false });
+
+                    var chart = new google.visualization.BarChart(document.getElementById('ReservationChart'));
+                    chart.draw(sortedData, options);
+                })
+                .fail(function (error) {
+                    console.error('Error loading data:', error);
+                });
+        }
+    </script>
 }
-    </tbody>
-</table>

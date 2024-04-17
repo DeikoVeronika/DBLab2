@@ -4,82 +4,84 @@
     ViewData["Title"] = "Інформація клієнта";
 }
 
-<div>
-    <h4>Інформація клієнта</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.PhoneNumber)</text>
-        </dd>
-        <dt class = "col-sm-2">
-            Дата народження
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Birthday)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-    </dl>
-</div>
-<div>
-    <h4>Бронювання клієнта</h4>
-    @if (Model.Reservations.Any())
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="table-name">Дата</th>
-                    <th class="table-name">Початок</th>
-                    <th class="table-name">Послуга</th>
-                    <th class="table-name">Майстер</th>
-                    <th class="table-name">Мобільний номер майстра</th>
-                    <th class="table-name">Вартість послуги ₴</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var reservation in Model.Reservations)
-                {
+<div class="content">
+    <div>
+        <h4>Інформація клієнта</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.FirstName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.FirstName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.LastName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.LastName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </dt>
+            <dd class="col-sm-10">
+                <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.PhoneNumber)</text>
+            </dd>
+            <dt class="col-sm-2">
+                Дата народження
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Birthday)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <h4>Бронювання клієнта</h4>
+        @if (Model.Reservations.Any())
+        {
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@reservation.TimeSlot.Date</td>
-                        <td>@reservation.TimeSlot.StartTime</td>
-                        <td>@reservation.TimeSlot.EmployeeService.Service.Name</td>
-                        <td>@reservation.TimeSlot.EmployeeService.Employee.FirstName @reservation.TimeSlot.EmployeeService.Employee.LastName</td>
-                        <td>
-                            <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(reservation.TimeSlot.EmployeeService.Employee.PhoneNumber)</text>
-                        </td>
-                        <td>@reservation.TimeSlot.EmployeeService.Service.Price</td>
+                        <th class="table-name">Дата</th>
+                        <th class="table-name">Початок</th>
+                        <th class="table-name">Послуга</th>
+                        <th class="table-name">Майстер</th>
+                        <th class="table-name">Мобільний номер майстра</th>
+                        <th class="table-name">Вартість послуги ₴</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Цей клієнт ще немає жодного бронювання.</p>
-    }
-</div>
+                </thead>
+                <tbody>
+                    @foreach (var reservation in Model.Reservations)
+                    {
+                        <tr>
+                            <td>@reservation.TimeSlot.Date</td>
+                            <td>@reservation.TimeSlot.StartTime</td>
+                            <td>@reservation.TimeSlot.EmployeeService.Service.Name</td>
+                            <td>@reservation.TimeSlot.EmployeeService.Employee.FirstName @reservation.TimeSlot.EmployeeService.Employee.LastName</td>
+                            <td>
+                                <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(reservation.TimeSlot.EmployeeService.Employee.PhoneNumber)</text>
+                            </td>
+                            <td>@reservation.TimeSlot.EmployeeService.Service.Price</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Цей клієнт ще немає жодного бронювання.</p>
+        }
+    </div>
 
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані клієнта</a> |
-    <a asp-action="Index">Назад</a>
+    <div>
+        <a class="btn-back-new" asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані клієнта</a>
+        <a class="btn-back-new" asp-action="Index">Назад</a>
+    </div>
 </div>

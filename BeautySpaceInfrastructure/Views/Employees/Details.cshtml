@@ -4,115 +4,120 @@
     ViewData["Title"] = "Деталі працівника";
 }
 
-<h4>Деталі працівника</h4>
-<hr />
-<div class="employee-details-container">
-    <table class="table">
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.FirstName)</th>
-            <td>@Html.DisplayFor(model => model.FirstName)</td>
-        </tr>
-        <tr>
-            <th>Прізвище</th>
-            <td>@Html.DisplayFor(model => model.LastName)</td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.PhoneNumber)</th>
-            <td><text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.PhoneNumber)</text></td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Position.Name)</th>
-            <td>@Html.DisplayFor(model => model.Position.Name)</td>
-        </tr>
-        <tr>
-            <th>Послуги</th>
-            <td>
-                @{
-                    //sort services
+<div class="content">
+    <h4>Деталі працівника</h4>
+    <hr />
+    <div class="employee-details-container">
+        <table class="table">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.FirstName)</th>
+                <td>@Html.DisplayFor(model => model.FirstName)</td>
+            </tr>
+            <tr>
+                <th>Прізвище</th>
+                <td>@Html.DisplayFor(model => model.LastName)</td>
+            </tr>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.PhoneNumber)</th>
+                <td><text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.PhoneNumber)</text></td>
+            </tr>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Position.Name)</th>
+                <td>@Html.DisplayFor(model => model.Position.Name)</td>
+            </tr>
+            <tr>
+                <th>Послуги</th>
+                <td>
+                    @{
+                        //sort services
 
-                    var sortedServices = Model.EmployeeServices;//.OrderBy(es => es.TimeSlots.OrderBy(ts => ts.Date).ThenBy(ts => ts.StartTime))
-                     
-                }
+                        var sortedServices = Model.EmployeeServices;//.OrderBy(es => es.TimeSlots.OrderBy(ts => ts.Date).ThenBy(ts => ts.StartTime))
 
-                @foreach (var service in sortedServices)
-                {
-                    <p>@service.Service.Name</p>
-                }
+                    }
+
+                    @foreach (var service in sortedServices)
+                    {
+                        <p>@service.Service.Name</p>
+                    }
 
 
-            </td>
-        </tr>
-    </table>
+                </td>
+            </tr>
+        </table>
 
-    <div class="img-employee-card-details">
-        @if (Model.EmployeePortrait != null)
-        {
-            var base64 = Convert.ToBase64String(Model.EmployeePortrait);
-            var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
-            <img class="img-employee-card" src="@imgSrc" alt="Avatar" style="height: 300px;
+        <div class="img-employee-card-details">
+            @if (Model.EmployeePortrait != null)
+            {
+                var base64 = Convert.ToBase64String(Model.EmployeePortrait);
+                var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                <img class="img-employee-card" src="@imgSrc" alt="Avatar" style="height: 300px;
                                                        width: 300px;
                                                        object-fit: cover;
                                                        border-radius: 2px;">
-        }
+            }
+        </div>
     </div>
-</div>
-<div>
-    @if (Accessibility.AllExceptUser(User))
-    {
-        <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані працівника</a>
-    }
-    <a asp-action="Index">Назад</a>
-</div>
+    <div>
+        @if (Accessibility.AllExceptUser(User))
+        {
+            <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати дані працівника</a>
+        }
+        <a asp-action="Index">Назад</a>
+    </div>
 
 
-<div class="employee-timeSlot">
-    <hr />
-    <h3>Графік майстра</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Дата</th>
-                <th>Початок</th>
-                <th>Кінець</th>
-                <th>Послуга</th>
-                <th>
-                    @if (Accessibility.AllExceptUser(User))
-                    {
-                        <a asp-controller="TimeSlots" asp-action="Create">Створити новий час для запису</a>
-                    }
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var service in Model.EmployeeServices)
-            {
-                if (service.TimeSlots.Any())
-                {
-                    foreach (var slot in service.TimeSlots)
-                    {
-                        if (slot.IsBooked && !Accessibility.AllExceptUser(User))
+    <div class="employee-timeSlot">
+        <hr />
+        <h3>Графік майстра</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Початок</th>
+                    <th>Кінець</th>
+                    <th>Послуга</th>
+                    <th>
+                        @if (Accessibility.AllExceptUser(User))
                         {
-                            continue;
+                            <a asp-controller="TimeSlots" asp-action="Create">Створити новий час для запису</a>
                         }
-                        <tr class="@(slot.IsBooked ? "table-danger" : "")">
-                            <td>@slot.Date</td>
-                            <td>@slot.StartTime</td>
-                            <td>@slot.EndTime</td>
-                            <td>@service.Service.Name</td>
-                            <td>
-                                @if (Accessibility.AllExceptUser(User))
-                                {
-                                    <a asp-controller="TimeSlots" asp-action="Edit" asp-route-id="@slot.Id">Редагувати</a>
-                                    <a asp-controller="TimeSlots" asp-action="Delete" asp-route-id="@slot.Id">Видалити</a>
-                                }
-                                <a asp-controller="TimeSlots" asp-action="Details" asp-route-id="@slot.Id">Деталі</a> 
-                            </td>
-                        </tr>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var service in Model.EmployeeServices)
+                {
+                    if (service.TimeSlots.Any())
+                    {
+                        foreach (var slot in service.TimeSlots)
+                        {
+                            if (slot.IsBooked && !Accessibility.AllExceptUser(User))
+                            {
+                                continue;
+                            }
+                            <tr class="@(slot.IsBooked ? "table-danger" : "")">
+                                <td>@slot.Date</td>
+                                <td>@slot.StartTime</td>
+                                <td>@slot.EndTime</td>
+                                <td>@service.Service.Name</td>
+                                <td>
+                                    <div class="actions">
+                                        @if (Accessibility.AllExceptUser(User))
+                                        {
+                                            <a asp-controller="TimeSlots" asp-action="Edit" asp-route-id="@slot.Id">Редагувати</a>
+                                            <a asp-controller="TimeSlots" asp-action="Delete" asp-route-id="@slot.Id">Видалити</a>
+                                        }
+                                        <a asp-controller="TimeSlots" asp-action="Details" asp-route-id="@slot.Id">Деталі</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
+
+    </div>
 
 </div>

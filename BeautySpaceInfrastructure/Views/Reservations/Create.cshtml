@@ -4,34 +4,61 @@
     ViewData["Title"] = "Створення бронювання";
 }
 
-<h4>Створення нового бронювання</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ClientId" class="control-label"></label>
-                <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
-                <span id="clientIdError" class="text-danger" style="display: @(ViewData.ModelState.ContainsKey("ClientId") ? "inline" : "none")">
-                    @Html.ValidationMessageFor(model => model.ClientId, "", new { @class = "text-danger" })
-                </span>
-            </div>
-            <div class="form-group">
+<div class="content">
+    <h4>Створення нового бронювання</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="ClientId" class="control-label"></label>
+                    <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
+                    <span id="clientIdError" class="text-danger" style="display: @(ViewData.ModelState.ContainsKey("ClientId") ? "inline" : "none")">
+                        @Html.ValidationMessageFor(model => model.ClientId, "", new { @class = "text-danger" })
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TimeSlotId" class="control-label"></label>
+                    <select asp-for="TimeSlotId" class="form-control" asp-items="ViewBag.TimeSlotId"></select>
+                </div>
+
+                @*             <div class="form-group">
+                <label asp-for="Reservation.ClientId" class="control-label"></label>
+                <select asp-for="Reservation.ClientId" class="form-control" asp-items="@(new SelectList(Model.Clients, "Id", "Name"))"></select>
+                </div>
+                <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(Model.Categories, "Id", "Name"))"></select>
+                </div>
+                <div class="form-group">
+                <label asp-for="ServiceId" class="control-label"></label>
+                <select asp-for="ServiceId" class="form-control" asp-items="@(new SelectList(Model.Services, "Id", "Name"))"></select>
+                </div>
+                <div class="form-group">
+                <label asp-for="EmployeeServiceId" class="control-label"></label>
+                <select asp-for="EmployeeServiceId" class="form-control" asp-items="@(new SelectList(Model.EmployeeServices, "Id", "Name"))"></select>
+                </div>
+                <div class="form-group">
                 <label asp-for="TimeSlotId" class="control-label"></label>
-                <select asp-for="TimeSlotId" class ="form-control" asp-items="ViewBag.TimeSlotId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Створити" class="btn btn-primary" />
-            </div>
-        </form>
+                <select asp-for="TimeSlotId" class="form-control" asp-items="@(new SelectList(Model.TimeSlots, "Id", "Date"))"></select>
+                </div>
+
+                <div class="form-group">
+                <label asp-for="TimeSlotId" class="control-label"></label>
+                <select asp-for="TimeSlotId" class="form-control" asp-items="@(new SelectList(Model.TimeSlots, "Id", "StartTime"))"></select>
+                </div> *@
+                <div class="edit-create-or-back">
+                    <input type="submit" value="Створити" class="btn btn-primary" />
+                    <a class="btn-back-new" asp-action="Index">Скасувати</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Скасувати</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+

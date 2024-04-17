@@ -197,5 +197,6 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             return _context.Positions.Any(e => e.Id == id);
         }
+
     }
 }

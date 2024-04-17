@@ -4,39 +4,44 @@
     ViewData["Title"] = "Працівники послуги";
 }
 
-<h1>Працівники послуги @ViewBag.ServiceName</h1>
+<div class="content">
+    <h1>Працівники послуги @ViewBag.ServiceName</h1>
 
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee)
-            </th>
-            <th>
-                @if (Accessibility.AllExceptUser(User))
-                    {
-                        @Html.ActionLink("Додати працівника до послуги", "Create", new { serviceId = ViewBag.ServiceId })
-                    }
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Employee)
                 </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.FirstName)
-                @Html.DisplayFor(modelItem => item.Employee.LastName)
-            </td>
-            <td>
- @*                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> | *@
-                    <a asp-action="Details" asp-route-id="@item.Id">Графік працівника</a>
+                <th>
                     @if (Accessibility.AllExceptUser(User))
                     {
-                    <a asp-action = "Delete" asp-route-id = "@item.Id" > Видалити </a>
+                        @Html.ActionLink("Додати працівника до послуги", "Create", new { serviceId = ViewBag.ServiceId }, new { @class = "btn-new" })
                     }
-                </td>
-        </tr>
-}
-    </tbody>
-</table>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                        @Html.DisplayFor(modelItem => item.Employee.LastName)
+                    </td>
+                    <td>
+                        <div class="actions">
+                            @*                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>  *@
+                            <a asp-action="Details" asp-route-id="@item.Id">Графік працівника</a>
+                            @if (Accessibility.AllExceptUser(User))
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.Id"> Видалити </a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

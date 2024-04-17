@@ -6,73 +6,78 @@
 
 }
 
-<h1>Час для запису</h1>
+<div class="content">
+    <h1>Час для запису</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.StartTime)
-            </th>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.EndTime)
-            </th>
-            <th class="table-name">
-                Майстер
-            </th>
-            <th class="table-name">
-                Послуга
-            </th>
-            <th> 
-            @if (Accessibility.AllExceptUser(User))
-            {
-                <a asp-action="Create">Створити новий час для запису</a>
-            }
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model) {
-            if (item.IsBooked && !Accessibility.AllExceptUser(User))
-            {
-                continue;
-            }
-                <tr class="@(item.IsBooked ? "table-danger" : "")">
-                <td>
-                    @Html.DisplayFor(modelItem => item.Date)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EndTime)
-                </td>
-                <td>
-                    @{
-                        var employeeFullName = dbbeautySpaceContext.Employees.Find(item.EmployeeService.EmployeeId);
-                    }
-                    @employeeFullName.FirstName @employeeFullName.LastName
-
-                </td>
-                <td>
-                    @{
-                        var serviceName = dbbeautySpaceContext.Services.Find(item.EmployeeService.ServiceId);
-                    }
-                    @serviceName.Name 
-
-                </td>
-                <td>
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.StartTime)
+                </th>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.EndTime)
+                </th>
+                <th class="table-name">
+                    Майстер
+                </th>
+                <th class="table-name">
+                    Послуга
+                </th>
+                <th>
                     @if (Accessibility.AllExceptUser(User))
                     {
-                        <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id"> Видалити </a>
+                        <a class="btn-new" asp-action="Create">Створити новий час для запису</a>
                     }
-                </td>
+                </th>
             </tr>
-    }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item.IsBooked && !Accessibility.AllExceptUser(User))
+                {
+                    continue;
+                }
+                <tr class="@(item.IsBooked ? "table-danger" : "")">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndTime)
+                    </td>
+                    <td>
+                        @{
+                            var employeeFullName = dbbeautySpaceContext.Employees.Find(item.EmployeeService.EmployeeId);
+                        }
+                        @employeeFullName.FirstName @employeeFullName.LastName
+
+                    </td>
+                    <td>
+                        @{
+                            var serviceName = dbbeautySpaceContext.Services.Find(item.EmployeeService.ServiceId);
+                        }
+                        @serviceName.Name
+
+                    </td>
+                    <td>
+                        <div class="actions">
+                            @if (Accessibility.AllExceptUser(User))
+                            {
+                                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id"> Видалити </a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

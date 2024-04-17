@@ -1,4 +1,19 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿let carouselEl = document.getElementById('bootstrap-gallery-carousel');
 
-// Write your JavaScript code.
+const carousel = new bootstrap.Carousel(carouselEl, {
+    interval: 3000,
+    wrap: true,
+});
+
+carouselEl.addEventListener('slide.bs.carousel', (event) => {
+    const container = document.querySelector('.carousel-inner');
+    window.lightGallery(container, {
+        thumbnail: true,
+        pager: false,
+        plugins: [lgThumbnail],
+        hash: false,
+        zoomFromOrigin: false,
+        preload: 3,
+        selector: '.lg-item',
+    });
+});

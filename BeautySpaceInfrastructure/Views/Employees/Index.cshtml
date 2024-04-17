@@ -4,84 +4,91 @@
     ViewData["Title"] = "Створення працівника";
 }
 
-<h1>Працівники посади @ViewBag.PositionName</h1>
+<div class="content">
+    <h1>Працівники посади @ViewBag.PositionName</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th class="table-name">
-                Прізвище
-            </th>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.PhoneNumber)
-            </th>
-            <th>@Html.ActionLink("Створити нового працівника", "Create", new { positionId = ViewBag.PositionId })</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.PhoneNumber))
-                {
-                    <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
-                }
-             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-
-<div class="employee-card-container">
-    @foreach (var item in Model)
-    {
-        <div class="employee-card">
-            
-            @if (item.EmployeePortrait != null)
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th class="table-name">
+                    Прізвище
+                </th>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </th>
+                <th>@Html.ActionLink("Створити нового працівника", "Create", new { positionId = ViewBag.PositionId }, new { @class = "btn-new" })</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                var base64 = Convert.ToBase64String(item.EmployeePortrait);
-                var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
-                <img class="img-employee-card" src="@imgSrc" alt="Avatar" style="height: 300px; 
-                                                       width:100%; 
-                                                       object-fit: cover;">
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                        {
+                            <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
+                        }
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                            <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                        </div>
+                    </td>
+                </tr>
             }
-            else
-            {
-            // Тут можна вказати шлях до зображення за замовчуванням
-                <img class="img-employee-card" src="" alt="No image" style="height: 300px;
+        </tbody>
+    </table>
+
+    <div class="employee-card-container">
+        @foreach (var item in Model)
+        {
+            <div class="employee-card">
+
+                @if (item.EmployeePortrait != null)
+                {
+                    var base64 = Convert.ToBase64String(item.EmployeePortrait);
+                    var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                    <img class="img-employee-card" src="@imgSrc" alt="Avatar" style="height: 300px;
+                                                       width:100%;
+                                                       object-fit: cover;">
+                }
+                else
+                {
+                    // Тут можна вказати шлях до зображення за замовчуванням
+                    <img class="img-employee-card" src="" alt="No image" style="height: 300px;
                                                   width:100%;
                                                   object-fit: cover;">
-            }
-            
-            <div class="container-employee-personal-card">
-                <h4><b>@item.FirstName @item.LastName</b></h4>
-                <p>@Html.DisplayFor(modelItem => item.Position.Name)</p>
-                <p>
-                    @if (!string.IsNullOrEmpty(item.PhoneNumber))
-                    {
-                        <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
-                    }
-                </p>
-                <p>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-                </p>
+                }
+
+                <div class="container-employee-personal-card">
+                    <h4><b>@item.FirstName @item.LastName</b></h4>
+                    <p>@Html.DisplayFor(modelItem => item.Position.Name)</p>
+                    <p>
+                        @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                        {
+                            <text>(@item.PhoneNumber.Substring(3, 3)) @item.PhoneNumber.Substring(6, 3)-@item.PhoneNumber.Substring(9, 2)-@item.PhoneNumber.Substring(11)</text>
+                        }
+                    </p>
+
+                    <div class="actions">
+                        <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                        <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    </div>
+
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>

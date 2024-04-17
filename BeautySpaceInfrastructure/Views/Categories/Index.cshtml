@@ -6,63 +6,68 @@
 
 }
 
-<h1>Доступні категорії</h1>
+<div class="content">
+    <h1>Доступні категорії</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @if (Accessibility.AllExceptUser(User))
-                {
-                    <a asp-action="Create">Створити нову категорію</a>
-                }
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @if (Accessibility.AllExceptUser(User))
+                    {
+                        <a class="btn-new" asp-action="Create">Створити нову категорію</a>
+                    }
 
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-             <a asp-action="Details" asp-route-id="@item.Id">Переглянути послуги</a>
-
-            @if (Accessibility.AllExceptUser(User))
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> 
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a asp-action="Details" asp-route-id="@item.Id">Переглянути послуги</a>
+
+                            @if (Accessibility.AllExceptUser(User))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                            }
+                        </div>
+                    </td>
+                </tr>
             }
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
-@if (Accessibility.AllExceptUser(User))
-{
-    <div style="display:flex; justify-content:space-around;">
-        <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Import">Завантажити з файлу</a>
-        <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Export">Експортувати у файл</a>
-    </div>
-}
+    @if (Accessibility.AllExceptUser(User))
+    {
+        <div style="display:flex; gap:20px;">
+            <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Import">Завантажити з файлу</a>
+            <a class="btn btn-outline-primary" type="=submit" asp-area="" asp-controller="Categories" asp-action="Export">Експортувати у файл</a>
+        </div>
+    }
 
 
 
 
-@if (!string.IsNullOrEmpty(successMessage))
-{
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            var successMessage = @Html.Raw(Json.Serialize(successMessage));
-            if (successMessage) {
-                alert(successMessage);
-            }
-        });
-    </script>
-}
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                var successMessage = @Html.Raw(Json.Serialize(successMessage));
+                if (successMessage) {
+                    alert(successMessage);
+                }
+            });
+        </script>
+    }
+</div>

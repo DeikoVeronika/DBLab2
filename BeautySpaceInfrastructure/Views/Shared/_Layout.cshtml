@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    string nameColor = "#343a40";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,6 +11,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BeautySpaceInfrastructure.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined&display=swap">
+
 </head>
 <body>
     <header>
@@ -18,7 +24,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 navigation-bar">
+                        <div class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Про нас</a>
                         </li>
@@ -31,11 +38,8 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Акаунт</a>
-                        </li>  
-                         @if (Accessibility.AllExceptUser(User))
-                        {
+                            @if (Accessibility.AllExceptUser(User))
+                            {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Positions" asp-action="Index">Посади</a>
                             </li>
@@ -48,25 +52,34 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="UserList">Ролі</a>
                             </li>
-                        }
+                            }
+                        </div>
 
+                        <div  class="navbar-nav flex-grow-1">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <form method="post" class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Logout">
+                                    <span style="color: @nameColor; margin-right: 4px;">@User.Identity.Name</span>
+                                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                                        <a class="material-icons-outlined" title="Вийти">logout</a>
+                                    </button>
+                                </form>
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <form method="post" class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Logout">
-                                @User.Identity.Name
-                                <input type="submit" value="logout" />
-                            </form>
-                        }
-                        else
-                        {
+                            }
+                            else
+                            {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Login">login</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Login">login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Register">register</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Register">register</a>
                             </li>
-                        }
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Кабінет</a>
+                            </li>
+                            }
+                        </div>
+                        
 
                     </ul>
                 </div>
@@ -90,3 +103,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+

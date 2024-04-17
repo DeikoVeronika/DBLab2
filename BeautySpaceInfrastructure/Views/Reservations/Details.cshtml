@@ -10,104 +10,106 @@
     var category = dbbeautySpaceContext.Categories.FirstOrDefault(c => c.Id == service.CategoryId);
 }
 
-<h2>Деталі бронювання</h2>
+<div class="content">
+    <h2>Деталі бронювання</h2>
 
-<div>
-    <hr />
-    <dl class="row">
-        <fieldset>
-            <legend>Основна інформація</legend>
-        </fieldset>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Category.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @category.Name
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @service.Name
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TimeSlot.Date)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.StartTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TimeSlot.StartTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.EndTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TimeSlot.EndTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @service.Price 
-        </dd>
+    <div>
         <hr />
-        <fieldset>
-            <legend>Інформація про клієнта</legend>
-        </fieldset>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Client.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Client.FirstName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Client.LastName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Client.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Client.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.Client.PhoneNumber)</text>
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Client.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Client.Email)
-        </dd>
-        <hr />
-        <fieldset>
-            <legend>Інформація про майстра</legend>
-        </fieldset>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Employee.FirstName)
-        </dt>
-        <dd class="col-sm-10">
-            @employee.FirstName
-        </dd>
-        <dt class="col-sm-2">
-            Прізвище
-        </dt>
-        <dd class="col-sm-10">
-            @employee.LastName
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Employee.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(employee.PhoneNumber)
-        </dd>
+        <dl class="row">
+            <fieldset>
+                <legend>Основна інформація</legend>
+            </fieldset>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Category.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @category.Name
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @service.Name
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.Date)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TimeSlot.Date)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.StartTime)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TimeSlot.StartTime)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.EndTime)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TimeSlot.EndTime)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Price)
+            </dt>
+            <dd class="col-sm-10">
+                @service.Price
+            </dd>
+            <hr />
+            <fieldset>
+                <legend>Інформація про клієнта</legend>
+            </fieldset>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Client.FirstName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Client.FirstName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Client.LastName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Client.LastName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Client.PhoneNumber)
+            </dt>
+            <dd class="col-sm-10">
+                <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.Client.PhoneNumber)</text>
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Client.Email)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Client.Email)
+            </dd>
+            <hr />
+            <fieldset>
+                <legend>Інформація про майстра</legend>
+            </fieldset>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Employee.FirstName)
+            </dt>
+            <dd class="col-sm-10">
+                @employee.FirstName
+            </dd>
+            <dt class="col-sm-2">
+                Прізвище
+            </dt>
+            <dd class="col-sm-10">
+                @employee.LastName
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Employee.PhoneNumber)
+            </dt>
+            <dd class="col-sm-10">
+                @BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(employee.PhoneNumber)
+            </dd>
 
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
-    <a asp-action="Index">Назад</a>
+        </dl>
+    </div>
+    <div>
+        <a class="btn-back-new" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+        <a class="btn-back-new" asp-action="Index">Назад</a>
+    </div>
 </div>

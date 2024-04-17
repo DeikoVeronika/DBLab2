@@ -4,43 +4,49 @@
     ViewData["Title"] = "Посади";
 }
 
-<h1>Посади</h1>
+<div class="content">
+    <h1>Посади</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th class="table-name">
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th><a asp-action="Create">Створити нову посаду</a></th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            var orderedPositions = Model.OrderByDescending(m => m.Name == "Резерв").ThenBy(m => m.Name);
-        }
-
-        @foreach (var item in orderedPositions)
-        {
-            string cssClass = "table-secondary";
-            if (item.Name == "Резерв")
-            {
-                cssClass = item.Employees.Any() ? "table-danger" : "table-success";
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="table-name">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    <a class="btn-new" asp-action="Create">Створити нову посаду</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var orderedPositions = Model.OrderByDescending(m => m.Name == "Резерв").ThenBy(m => m.Name);
             }
 
-            <tr class="@cssClass">
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Переглянути працівників</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            @foreach (var item in orderedPositions)
+            {
+                string cssClass = "table-secondary";
+                if (item.Name == "Резерв")
+                {
+                    cssClass = item.Employees.Any() ? "table-danger" : "table-success";
+                }
+
+                <tr class="@cssClass">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a asp-action="Details" asp-route-id="@item.Id">Переглянути працівників</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @{
     var errorMessage = TempData["ErrorMessage"] as string;

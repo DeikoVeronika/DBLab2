@@ -19,6 +19,34 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             _context = context;
         }
+        //private List<Client> GetClients()
+        //{
+        //    return _context.Clients.ToList();
+        //}
+        //private List<TimeSlot> GetTimeSlots()
+        //{
+        //    return _context.TimeSlots.ToList();
+        //}
+
+        //private List<Category> GetCategories()
+        //{
+        //    return _context.Categories.ToList();
+        //}
+        //private List<Service> GetServices()
+        //{
+        //    return _context.Services.ToList();
+        //}
+        //private List<EmployeeService> GetEmployeeServices()
+        //{
+        //    return _context.EmployeeServices.ToList();
+        //}
+
+        //private List<Employee> GetEmployees()
+        //{
+        //    return _context.Employees.ToList();
+        //}
+
+
 
         // GET: Reservations
         public async Task<IActionResult> Index()
@@ -48,12 +76,27 @@ namespace BeautySpaceInfrastructure.Controllers
         }
 
         // GET: Reservations/Create
+        //public IActionResult Create()
+        //{
+        //    var viewModel = new ReservationViewModel
+        //    {
+        //        Clients = GetClients(),
+        //        Categories = GetCategories(),
+        //        Services = GetServices(),
+        //        EmployeeServices = GetEmployeeServices(),
+        //        Employees = GetEmployees(),
+        //        TimeSlots = GetTimeSlots(), // Populate TimeSlots
+        //        Reservation = new Reservation()
+        //    };
+        //    return View(viewModel);
+        //}
         public IActionResult Create()
         {
             ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text");
             ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text");
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

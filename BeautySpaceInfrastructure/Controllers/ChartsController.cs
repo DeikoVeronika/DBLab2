@@ -15,8 +15,8 @@ namespace BeautySpaceInfrastructure.Controllers
             _context = context;
         }
 
-        [HttpGet("JsonData")]
-        public JsonResult JsonData()
+        [HttpGet("JsonDataCategory")]
+        public JsonResult JsonDataCategory()
         {
             var categories = _context.Categories.Include(ts => ts.Services).ToList();
             List<object> catService = new List<object>();
@@ -28,5 +28,20 @@ namespace BeautySpaceInfrastructure.Controllers
 
             return new JsonResult(catService);
         }
+
+        [HttpGet("JsonDataReservation")]
+        public JsonResult JsonDataReservation()
+        {
+            var clients = _context.Clients.Include(c => c.Reservations).ToList();
+            List<object> cReservation = new List<object>();
+            cReservation.Add(new[] { "Клієнт", "Кількість бронювань" });
+            foreach (var c in clients)
+            {
+                cReservation.Add(new object[] { c.FirstName + " " + c.LastName, c.Reservations.Count() });
+            }
+
+            return new JsonResult(cReservation);
+        }
+
     }
 }
