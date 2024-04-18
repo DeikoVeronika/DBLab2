@@ -181,6 +181,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+
         }
 
         private bool ClientExists(int id)
@@ -227,5 +228,21 @@ namespace BeautySpaceInfrastructure.Controllers
 
             return false;
         }
+
+        [HttpGet]
+        public async Task<bool> CheckReservations(int clientId)
+        {
+            var client = await _context.Clients.Include(c => c.Reservations).FirstOrDefaultAsync(c => c.Id == clientId);
+            if (client != null)
+            {
+                if (client.Reservations.Any())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 }

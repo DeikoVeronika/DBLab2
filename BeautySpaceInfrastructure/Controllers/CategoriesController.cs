@@ -159,26 +159,32 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var service = await _context.Services
-                .Include(s => s.EmployeeServices)
-                .ThenInclude(es => es.TimeSlots)
-                .ThenInclude(ts => ts.Reservations)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            var category = await _context.Categories
+                .Include(c => c.Services)
+                    .ThenInclude(s => s.EmployeeServices)
+                        .ThenInclude(es => es.TimeSlots)
+                            .ThenInclude(ts => ts.Reservations)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (service != null)
+            if (category != null)
             {
-                foreach (var employeeService in service.EmployeeServices)
+                foreach (var service in category.Services)
                 {
-                    _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+                    foreach (var employeeService in service.EmployeeServices)
+                    {
+                        _context.TimeSlots.RemoveRange(employeeService.TimeSlots);
+                    }
+                    _context.EmployeeServices.RemoveRange(service.EmployeeServices);
                 }
-                _context.EmployeeServices.RemoveRange(service.EmployeeServices);
-                _context.Services.Remove(service);
+                _context.Services.RemoveRange(category.Services);
+                _context.Categories.Remove(category);
 
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
 

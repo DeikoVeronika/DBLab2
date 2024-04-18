@@ -227,6 +227,17 @@ namespace BeautySpaceInfrastructure.Controllers
             return false;
         }
 
+        public IActionResult GetServicesByCategory(int categoryId)
+        {
+            var services = _context.Services
+                .Where(s => s.CategoryId == categoryId)
+                .Select(s => new { value = s.Id, text = s.Name })
+                .ToList();
+
+            return Json(services);
+        }
+
+
 
     }
 }

@@ -1,23 +1,29 @@
 ﻿using BeautySpaceDomain.Model;
 using Humanizer.Localisation;
 
-namespace BeautySpaceInfrastructure.ViewModel
+namespace BeautySpaceInfrastructure.ViewModel;
+
+public class ReservationViewModel
 {
-    public class ReservationViewModel
+    private readonly DbbeautySpaceContext _context;
+
+    public ReservationViewModel()
     {
-        public Reservation Reservation { get; set; } = null!;
-        public int CategoryId { get; set; }
-        public int ServiceId { get; set; }
-        public int EmployeeServiceId { get; set; }
-        public int TimeSlotId { get; set; }
-        public int ClientId { get; set; }
-
-        public List<Category> Categories { get; set; }
-        public List<Client> Clients { get; set; }
-        public List<EmployeeService> EmployeeServices { get; set; }
-        public List<TimeSlot> TimeSlots { get; set; }
-        public List<Employee> Employees { get; set; }
-        public List<Service> Services { get; set; }
-
+        // Parameterless constructor for model binding
     }
+
+    public ReservationViewModel(DbbeautySpaceContext context)
+    {
+        _context = context;
+    }
+
+    public Reservation? Reservation { get; set; } = null!;
+    public int CategoryId { get; set; }
+    public int ServiceId { get; set; }
+    public int EmployeeServiceId { get; set; }
+    public int TimeSlotId { get; set; }
+    public int ClientId { get; set; }
+    public virtual TimeSlot? TimeSlot { get; set; } = null!;
+    public virtual Client? Client { get; set; } = null!;
+    public string? Info { get; set; } = null!;
 }

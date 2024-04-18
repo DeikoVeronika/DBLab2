@@ -106,6 +106,7 @@ div.delete-or-back {
     display: flex;
     margin-top: 15px;
     gap: 20px;
+    align-items: center;
 }
 
 

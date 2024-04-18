@@ -360,6 +360,39 @@ namespace BeautySpaceInfrastructure.Controllers
             return false;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetTimeSlotsByEmployeeServiceId(int employeeId, int serviceId)
+        {
+            // Find the EmployeeServiceId based on the selected EmployeeId and ServiceId
+            var employeeService = await _context.EmployeeServices.FirstOrDefaultAsync(es => es.EmployeeId == employeeId && es.ServiceId == serviceId);
+
+            if (employeeService != null)
+            {
+                // Get time slots for the found EmployeeServiceId
+                var timeSlots = await _context.TimeSlots
+                    .Where(t => t.EmployeeServiceId == employeeService.Id && !t.IsBooked) // Filter out the booked time slots
+                    .ToListAsync();
+
+                var timeSlotSelectList = timeSlots.Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = $"{t.Date.ToString("dd.MM")} {t.StartTime.ToString("HH:mm")}" // Додайте час до тексту
+                }).ToList();
+
+
+                return Json(timeSlotSelectList);
+            }
+            else
+            {
+                // No EmployeeService found for the selected EmployeeId and ServiceId
+                return Json(new List<SelectListItem>());
+            }
+        }
+
+
+
+
+
 
 
     }

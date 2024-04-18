@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using BeautySpaceDomain.Model;
 using BeautySpaceInfrastructure;
 using DocumentFormat.OpenXml.EMMA;
+using BeautySpaceInfrastructure.ViewModel;
 
 namespace BeautySpaceInfrastructure.Controllers
 {
@@ -90,31 +91,57 @@ namespace BeautySpaceInfrastructure.Controllers
         //    };
         //    return View(viewModel);
         //}
-        public IActionResult Create()
+        //public IActionResult Create()
+        //{
+        //    ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text");
+        //    ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text");
+        //    return View();
+        //}
+
+        public IActionResult CreateReservation()
         {
-            ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text");
-            ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text");
-            return View();
+            var reservationViewModel = new ReservationViewModel();
+
+
+            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "PhoneNumber");
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name");
+            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id");
+            ViewData["EmployeeId"] = new SelectList(_context.Clients, "Id", "Name");
+            ViewData["TimeSlotDateId"] = new SelectList(_context.TimeSlots, "Id", "Date");
+            ViewData["TimeSlotTimeId"] = new SelectList(_context.TimeSlots, "Id", "StartTime");
+
+            return View(reservationViewModel);
         }
+
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,Info,TimeSlotId,Id")] Reservation reservation)
+
+        public async Task<IActionResult> Create([Bind("ClientId,Info,TimeSlotId,Id")] ReservationViewModel reservationViewModel)
         {
             if (ModelState.IsValid)
             {
                 // Перевірка на існування ідентичного бронювання
                 var existingReservation = await _context.Reservations
-                    .FirstOrDefaultAsync(r => r.ClientId == reservation.ClientId && r.TimeSlotId == reservation.TimeSlotId);
+                    .FirstOrDefaultAsync(r => r.ClientId == reservationViewModel.ClientId && r.TimeSlotId == reservationViewModel.TimeSlotId);
 
                 if (existingReservation != null)
                 {
                     ModelState.AddModelError("ClientId", "Таке бронювання для цього клієнта вже існує.");
-                    ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservation.ClientId);
-                    ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservation.TimeSlotId);
-                    return View(reservation);
+                    ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservationViewModel.ClientId);
+                    ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservationViewModel.TimeSlotId);
+                    return View(reservationViewModel);
                 }
+
+                var reservation = new Reservation
+                {
+                    ClientId = reservationViewModel.ClientId,
+                    Info = reservationViewModel.Info,
+                    TimeSlotId = reservationViewModel.TimeSlotId,
+                    // Інші властивості резервації можуть бути встановлені тут
+                };
 
                 reservation.Info = DateTime.Now.ToString("HH:mm:ss dd.MM.yyyy");
                 _context.Add(reservation);
@@ -133,10 +160,11 @@ namespace BeautySpaceInfrastructure.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservation.ClientId);
-            ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservation.TimeSlotId);
-            return View(reservation);
+            ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservationViewModel.ClientId);
+            ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservationViewModel.TimeSlotId);
+            return View(reservationViewModel);
         }
+
 
 
 

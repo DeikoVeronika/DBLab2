@@ -26,11 +26,13 @@
             </dd>
         </dl>
 
-        <form id="deleteForm" asp-action="Delete">
-            <input type="hidden" asp-for="Id" />
-            <a asp-action="Index">Назад</a>
-        </form>
-        <button class="btn btn-danger" onclick="confirmDelete() ">Видалити</button>
+        <div class="delete-or-back">
+            <form id="deleteForm" asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <a asp-action="Index">Назад</a>
+            </form>
+            <button class="btn btn-danger" onclick="confirmDelete() ">Видалити</button>
+        </div>
     </div>
 </div>
 

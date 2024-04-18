@@ -1,0 +1,204 @@
+﻿@model BeautySpaceInfrastructure.ViewModel.ReservationViewModel
+
+@{
+    ViewData["Title"] = "Створення бронювання";
+}
+
+ <div class="content">
+        <form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="ClientId" class="control-label"></label>
+        <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
+        <span id="clientIdError" class="text-danger" style="display: @(ViewData.ModelState.ContainsKey("ClientId") ? "inline" : "none")">
+            @Html.ValidationMessageFor(model => model.ClientId, "", new { @class = "text-danger" })
+        </span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CategoryId" class="control-label">Category</label>
+        <select id="CategoryId" class="form-control" asp-for="CategoryId" asp-items="ViewBag.CategoryId">
+            <option value="" disabled selected>Оберіть категорію</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ServiceId" class="control-label">Service</label>
+        <select id="ServiceId" class="form-control" asp-for="ServiceId">
+            <option value="" disabled selected>Спочатку оберіть категорію</option>
+        </select>
+
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EmployeeServiceId" class="control-label">Employee</label>
+        <select id="EmployeeServiceId" class="form-control" asp-for="EmployeeServiceId" asp-items="ViewBag.EmployeeServiceId">
+            <option value="" disabled selected>Спочатку оберіть послугу</option>
+        </select>
+    </div>
+
+
+
+    @* дата *@
+        <div class="form-group">
+            <label asp-for="TimeSlotId" class="control-label">Time Slot</label>
+            <select id="TimeSlot" class="form-control" asp-for="TimeSlotId" asp-items="ViewBag.TimeSlotId">
+                <option value="" disabled selected>Спочатку оберіть майстра</option>
+            </select>
+        </div>
+
+
+    <div class="edit-create-or-back">
+        <input type="submit" value="Створити" class="btn btn-primary" />
+        <a class="btn-back-new" asp-action="Index">Скасувати</a>
+    </div>
+
+    </form>
+
+ </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Функція для встановлення стану ServiceId
+            function setServiceIdState(disabled) {
+                $('#ServiceId').prop('disabled', disabled);
+            }
+
+            // Функція для встановлення стану EmployeeServiceId
+            function setEmployeeServiceIdState(disabled) {
+                $('#EmployeeServiceId').prop('disabled', disabled);
+            }
+
+            // Функція для встановлення стану TimeSlot
+            function setTimeSlotState(disabled) {
+                $('#TimeSlot').prop('disabled', disabled);
+            }
+
+            // Початковий стан ServiceId, EmployeeServiceId та TimeSlot
+            setServiceIdState(true);
+            setEmployeeServiceIdState(true);
+            setTimeSlotState(true);
+
+            // При зміні значення категорії
+            $('#CategoryId').change(function () {
+                var categoryId = $(this).val();
+                if (categoryId) {
+                    $.ajax({
+                        url: '/Services/GetServicesByCategory',
+                        type: 'GET',
+                        data: { categoryId: categoryId },
+                        success: function (data) {
+                            var serviceSelect = $('#ServiceId');
+                            serviceSelect.empty();
+                            // Додайте випадковий елемент
+                            serviceSelect.append($('<option>', {
+                                value: '',
+                                text: 'Оберіть послугу',
+                                disabled: 'disabled',
+                                selected: 'selected'
+                            }));
+                            $.each(data, function (i, item) {
+                                serviceSelect.append($('<option>', {
+                                    value: item.value,
+                                    text: item.text
+                                }));
+                            });
+                            // Після отримання даних активуємо ServiceId
+                            setServiceIdState(false);
+
+                            // При зміні категорії, блокуємо поле вибору працівника та TimeSlot
+                            setEmployeeServiceIdState(true);
+                            setTimeSlotState(true);
+
+                            // Знову встановлюємо значення для поля вибору працівника
+                            $('#EmployeeServiceId').empty().append('<option value="" disabled selected>Спочатку оберіть послугу</option>');
+                        }
+                    });
+                } else {
+                    // Якщо категорію не обрано, робимо ServiceId, EmployeeServiceId та TimeSlot недоступними
+                    setServiceIdState(true);
+                    setEmployeeServiceIdState(true);
+                    setTimeSlotState(true);
+                }
+            });
+
+            // При зміні ServiceId
+            $('#ServiceId').change(function () {
+                var serviceId = $(this).val();
+                if (serviceId) {
+                    $.ajax({
+                        url: '/TimeSlots/GetEmployeesByServiceId',
+                        type: 'GET',
+                        data: { serviceId: serviceId },
+                        success: function (data) {
+                            var employeeServiceSelect = $('#EmployeeServiceId');
+                            employeeServiceSelect.empty();
+                            // Дефолтне значення
+                            employeeServiceSelect.append($('<option>', {
+                                value: '',
+                                text: 'Оберіть працівника',
+                                disabled: 'disabled',
+                                selected: 'selected'
+                            }));
+                            $.each(data, function (i, item) {
+                                employeeServiceSelect.append($('<option>', {
+                                    value: item.value,
+                                    text: item.text
+                                }));
+                            });
+                            // Після отримання даних активуємо EmployeeServiceId
+                            setEmployeeServiceIdState(false);
+                            // При зміні ServiceId, блокуємо поле вибору часу
+                            setTimeSlotState(true);
+                        }
+                    });
+                } else {
+                    // Якщо ServiceId не обрано, робимо EmployeeServiceId та TimeSlot неактивними
+                    setEmployeeServiceIdState(true);
+                    setTimeSlotState(true);
+                }
+            });
+
+            // При зміні EmployeeServiceId
+            $('#EmployeeServiceId').change(function () {
+                var employeeServiceId = $(this).val();
+                var serviceId = $('#ServiceId').val(); // Get the selected serviceId
+                if (employeeServiceId && serviceId) {
+                    $.ajax({
+                        url: '/TimeSlots/GetTimeSlotsByEmployeeServiceId',
+                        type: 'GET',
+                        data: { employeeId: employeeServiceId, serviceId: serviceId }, // Pass both employeeId and serviceId
+                        success: function (data) {
+                            var timeSlotSelect = $('#TimeSlot');
+                            timeSlotSelect.empty();
+                            // Default value
+                            timeSlotSelect.append($('<option>', {
+                                value: '',
+                                text: 'Оберіть час',
+                                disabled: 'disabled',
+                                selected: 'selected'
+                            }));
+                            $.each(data, function (i, item) {
+                                timeSlotSelect.append($('<option>', {
+                                    value: item.value,
+                                    text: item.text
+                                }));
+                            });
+                            // Після отримання даних активуємо TimeSlot
+                            setTimeSlotState(false);
+                        }
+                    });
+                } else {
+                    // Якщо EmployeeServiceId або ServiceId не обрано, робимо TimeSlot неактивним
+                    setTimeSlotState(true);
+                }
+            });
+        });
+
+    </script>
+}
