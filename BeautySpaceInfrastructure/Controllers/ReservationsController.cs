@@ -265,24 +265,51 @@ namespace BeautySpaceInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var reservation = await _context.Reservations.FindAsync(id);
-            if (reservation == null)
+            if (!await DeleteReservationAndUpdateTimeSlot(id))
             {
                 return NotFound();
             }
 
-            // Знайти відповідний часовий слот і оновити його властивість IsBooked
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMultiple(List<int> selectedReservations)
+        {
+            if (selectedReservations == null || !selectedReservations.Any())
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            foreach (var id in selectedReservations)
+            {
+                await DeleteReservationAndUpdateTimeSlot(id);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<bool> DeleteReservationAndUpdateTimeSlot(int reservationId)
+        {
+            var reservation = await _context.Reservations.FindAsync(reservationId);
+            if (reservation == null)
+            {
+                return false;
+            }
+
             var timeSlot = await _context.TimeSlots.FindAsync(reservation.TimeSlotId);
             if (timeSlot != null)
             {
-                timeSlot.IsBooked = false; // Позначити часовий слот як не заброньований
+                timeSlot.IsBooked = false;
             }
 
             _context.Reservations.Remove(reservation);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            return true;
         }
+
+
 
 
         private bool ReservationExists(int id)

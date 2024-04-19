@@ -7,10 +7,13 @@
 
 <div class="content">
     <h1>Створені бронювання</h1>
-
-    <table class="table">
+    <form id="deleteForm" asp-action="DeleteMultiple" method="post">
+        <table class="table">
         <thead>
             <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" onclick="toggleCheckboxes(this)" />
+                </th>
                 <th class="table-name">
                     @Html.DisplayNameFor(model => model.TimeSlot.Date)
                 </th>
@@ -41,6 +44,9 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>
+                        <input type="checkbox" name="selectedReservations" value="@item.Id" />
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.TimeSlot.Date)
                     </td>
@@ -87,4 +93,41 @@
             }
         </tbody>
     </table>
+        <button type="button" style="margin-top: 25px;" class="btn" onclick="confirmDelete()">Видалити обрані бронювання</button>
+    </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function toggleCheckboxes(source) {
+            var checkboxes = document.querySelectorAll('input[name="selectedReservations"]');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Підтвердження видалення',
+                text: "Ви дійсно хочете видалити вибрані бронювання?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ab0c24',
+                cancelButtonColor: '#6d6d6d',
+                confirmButtonText: 'Так, видалити',
+                cancelButtonText: 'Ні, скасувати'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+                }
+            });
+        }
+    </script>
+
+
+}
