@@ -7,6 +7,47 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="img\employeeAvatar.jpg" />
+    <None Remove="img\employeeAvatar1.jpg" />
+    <None Remove="img\Epilation.jpg" />
+    <None Remove="img\Hair-service.jpg" />
+    <None Remove="img\Haircut.jpg" />
+    <None Remove="img\Makeup.jpg" />
+    <None Remove="img\Manicure.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="img\employeeAvatar.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="img\employeeAvatar1.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="img\Epilation.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="img\Hair-service.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="img\Haircut.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="img\Makeup.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="img\Manicure.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
@@ -26,10 +67,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BeautySpaceDomain\BeautySpaceDomain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="img\" />
   </ItemGroup>
 
 </Project>

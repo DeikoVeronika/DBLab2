@@ -85,119 +85,136 @@
             setTimeSlotState(true);
 
             // При зміні значення категорії
-            $('#CategoryId').change(function () {
-                var categoryId = $(this).val();
-                if (categoryId) {
-                    $.ajax({
-                        url: '/Services/GetServicesByCategory',
-                        type: 'GET',
-                        data: { categoryId: categoryId },
-                        success: function (data) {
-                            var serviceSelect = $('#ServiceId');
-                            serviceSelect.empty();
-                            // Додайте випадковий елемент
-                            serviceSelect.append($('<option>', {
-                                value: '',
-                                text: 'Оберіть послугу',
-                                disabled: 'disabled',
-                                selected: 'selected'
-                            }));
-                            $.each(data, function (i, item) {
-                                serviceSelect.append($('<option>', {
-                                    value: item.value,
-                                    text: item.text
-                                }));
-                            });
-                            // Після отримання даних активуємо ServiceId
-                            setServiceIdState(false);
+            async function fetchServices(categoryId) {
+                const response = await $.ajax({
+                    url: '/Services/GetServicesByCategory',
+                    type: 'GET',
+                    data: { categoryId: categoryId }
+                });
+                return response;
+            }
 
-                            // При зміні категорії, блокуємо поле вибору працівника та TimeSlot
-                            setEmployeeServiceIdState(true);
-                            setTimeSlotState(true);
+            function createOption(value, text, disabled = false, selected = false) {
+                return $('<option>', {
+                    value: value,
+                    text: text,
+                    disabled: disabled,
+                    selected: selected
+                });
+            }
 
-                            // Знову встановлюємо значення для поля вибору працівника
-                            $('#EmployeeServiceId').empty().append('<option value="" disabled selected>Спочатку оберіть послугу</option>');
-                        }
-                    });
+            function populateServices(services) {
+                const serviceSelect = $('#ServiceId');
+                serviceSelect.empty();
+
+                if (services.length === 0) {
+                    serviceSelect.append(createOption('', 'Список послуг порожній', true, true));
                 } else {
-                    // Якщо категорію не обрано, робимо ServiceId, EmployeeServiceId та TimeSlot недоступними
+                    serviceSelect.append(createOption('', 'Оберіть послугу', true, true));
+                    services.forEach(item => {
+                        serviceSelect.append(createOption(item.value, item.text));
+                    });
+                }
+            }
+
+            $('#CategoryId').change(async function () {
+                const categoryId = $(this).val();
+                if (categoryId) {
+                    const services = await fetchServices(categoryId);
+                    populateServices(services);
+
+                    setServiceIdState(false);
+                    setEmployeeServiceIdState(true);
+                    setTimeSlotState(true);
+
+                    $('#EmployeeServiceId').empty().append(createOption('', 'Спочатку оберіть послугу', true, true));
+                    $('#TimeSlot').empty().append(createOption('', 'Спочатку оберіть майстра', true, true));
+                } else {
                     setServiceIdState(true);
                     setEmployeeServiceIdState(true);
                     setTimeSlotState(true);
                 }
             });
 
+
             // При зміні ServiceId
-            $('#ServiceId').change(function () {
-                var serviceId = $(this).val();
-                if (serviceId) {
-                    $.ajax({
-                        url: '/TimeSlots/GetEmployeesByServiceId',
-                        type: 'GET',
-                        data: { serviceId: serviceId },
-                        success: function (data) {
-                            var employeeServiceSelect = $('#EmployeeServiceId');
-                            employeeServiceSelect.empty();
-                            // Дефолтне значення
-                            employeeServiceSelect.append($('<option>', {
-                                value: '',
-                                text: 'Оберіть працівника',
-                                disabled: 'disabled',
-                                selected: 'selected'
-                            }));
-                            $.each(data, function (i, item) {
-                                employeeServiceSelect.append($('<option>', {
-                                    value: item.value,
-                                    text: item.text
-                                }));
-                            });
-                            // Після отримання даних активуємо EmployeeServiceId
-                            setEmployeeServiceIdState(false);
-                            // При зміні ServiceId, блокуємо поле вибору часу
-                            setTimeSlotState(true);
-                        }
-                    });
+            async function fetchEmployees(serviceId) {
+                const response = await $.ajax({
+                    url: '/TimeSlots/GetEmployeesByServiceId',
+                    type: 'GET',
+                    data: { serviceId: serviceId }
+                });
+                return response;
+            }
+
+            function populateEmployees(employees) {
+                const employeeSelect = $('#EmployeeServiceId');
+                employeeSelect.empty();
+
+                if (employees.length === 0) {
+                    employeeSelect.append(createOption('', 'Список працівників порожній', true, true));
                 } else {
-                    // Якщо ServiceId не обрано, робимо EmployeeServiceId та TimeSlot неактивними
+                    employeeSelect.append(createOption('', 'Оберіть працівника', true, true));
+                    employees.forEach(item => {
+                        employeeSelect.append(createOption(item.value, item.text));
+                    });
+                }
+            }
+
+            $('#ServiceId').change(async function () {
+                const serviceId = $(this).val();
+                if (serviceId) {
+                    const employees = await fetchEmployees(serviceId);
+                    populateEmployees(employees);
+
+                    setEmployeeServiceIdState(false);
+                    setTimeSlotState(true);
+
+                    $('#TimeSlot').empty().append(createOption('', 'Спочатку оберіть майстра', true, true));
+                } else {
                     setEmployeeServiceIdState(true);
                     setTimeSlotState(true);
                 }
             });
 
-            // При зміні EmployeeServiceId
-            $('#EmployeeServiceId').change(function () {
-                var employeeServiceId = $(this).val();
-                var serviceId = $('#ServiceId').val(); // Get the selected serviceId
-                if (employeeServiceId && serviceId) {
-                    $.ajax({
-                        url: '/TimeSlots/GetTimeSlotsByEmployeeServiceId',
-                        type: 'GET',
-                        data: { employeeId: employeeServiceId, serviceId: serviceId }, // Pass both employeeId and serviceId
-                        success: function (data) {
-                            var timeSlotSelect = $('#TimeSlot');
-                            timeSlotSelect.empty();
-                            // Default value
-                            timeSlotSelect.append($('<option>', {
-                                value: '',
-                                text: 'Оберіть час',
-                                disabled: 'disabled',
-                                selected: 'selected'
-                            }));
-                            $.each(data, function (i, item) {
-                                timeSlotSelect.append($('<option>', {
-                                    value: item.value,
-                                    text: item.text
-                                }));
-                            });
-                            // Після отримання даних активуємо TimeSlot
-                            setTimeSlotState(false);
-                        }
-                    });
+            async function fetchTimeSlots(employeeServiceId, serviceId) {
+                const response = await $.ajax({
+                    url: '/TimeSlots/GetTimeSlotsByEmployeeServiceId',
+                    type: 'GET',
+                    data: { employeeId: employeeServiceId, serviceId: serviceId }
+                });
+                return response;
+            }
+
+            function populateTimeSlots(timeSlots) {
+                const timeSlotSelect = $('#TimeSlot');
+                timeSlotSelect.empty();
+
+                if (timeSlots.length === 0) {
+                    timeSlotSelect.append(createOption('', 'Бронювання у цього працівника для цієї послуги наразі недоступні', true, true));
                 } else {
-                    // Якщо EmployeeServiceId або ServiceId не обрано, робимо TimeSlot неактивним
+                    timeSlotSelect.append(createOption('', 'Оберіть час', true, true));
+                    timeSlots.forEach(item => {
+                        timeSlotSelect.append(createOption(item.value, item.text));
+                    });
+                }
+            }
+
+            $('#EmployeeServiceId').change(async function () {
+                const employeeServiceId = $(this).val();
+                const serviceId = $('#ServiceId').val();
+                if (employeeServiceId && serviceId) {
+                    const timeSlots = await fetchTimeSlots(employeeServiceId, serviceId);
+                    populateTimeSlots(timeSlots);
+
+                    setTimeSlotState(false);
+                } else {
                     setTimeSlotState(true);
                 }
             });
+
+
+
         });
 
     </script>

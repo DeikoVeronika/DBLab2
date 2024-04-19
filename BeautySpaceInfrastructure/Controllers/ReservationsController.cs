@@ -102,9 +102,12 @@ namespace BeautySpaceInfrastructure.Controllers
         {
             var reservationViewModel = new ReservationViewModel();
 
-
             ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "PhoneNumber");
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+
+            // Фільтруємо категорії, які мають послуги
+            var categoriesWithServices = _context.Categories.Where(c => c.Services.Any()).ToList();
+            ViewData["CategoryId"] = new SelectList(categoriesWithServices, "Id", "Name");
+
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name");
             ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "Id");
             ViewData["EmployeeId"] = new SelectList(_context.Clients, "Id", "Name");
@@ -113,6 +116,8 @@ namespace BeautySpaceInfrastructure.Controllers
 
             return View(reservationViewModel);
         }
+
+
 
 
 
@@ -182,10 +187,21 @@ namespace BeautySpaceInfrastructure.Controllers
             {
                 return NotFound();
             }
+
+            // Мапування Reservation на ReservationViewModel
+            var reservationViewModel = new ReservationViewModel
+            {
+                Reservation = reservation,
+                ClientId = reservation.ClientId,
+                // Додайте інші властивості ReservationViewModel, які вам потрібні для редагування
+            };
+
             ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email", reservation.ClientId);
             ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Id", reservation.TimeSlotId);
-            return View(reservation);
+
+            return View(reservationViewModel);
         }
+
 
         // POST: Reservations/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
