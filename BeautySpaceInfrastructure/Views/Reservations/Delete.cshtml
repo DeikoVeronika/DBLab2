@@ -2,32 +2,121 @@
 
 @{
     ViewData["Title"] = "Видалення бронювання";
+
+    DbbeautySpaceContext dbbeautySpaceContext = new DbbeautySpaceContext();
+    var employeeService = dbbeautySpaceContext.EmployeeServices.FirstOrDefault(es => es.Id == Model.TimeSlot.EmployeeServiceId);
+    var employee = dbbeautySpaceContext.Employees.FirstOrDefault(e => e.Id == employeeService.EmployeeId);
+    var service = dbbeautySpaceContext.Services.FirstOrDefault(e => e.Id == employeeService.ServiceId);
+
+    var category = dbbeautySpaceContext.Categories.FirstOrDefault(c => c.Id == service.CategoryId);
 }
 
 <div class="content">
     <div>
-        <h4>Видалення бронювання</h4>
-        <hr />
-        <dl class="row">
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Info)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Info)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Client)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Client.Email)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.TimeSlot)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.TimeSlot.Id)
-            </dd>
-        </dl>
+        <h2>Видалення бронювання</h2>
+        <h4>Деталі бронювання</h4>
+
+        <div>
+            <hr />
+            <dl class="row">
+                <fieldset>
+                    <legend>Основна інформація</legend>
+                </fieldset>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Category.Name)
+                </dt>
+                <dd class="col-sm-10">
+                    @category.Name
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Name)
+                </dt>
+                <dd class="col-sm-10">
+                    @service.Name
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.Date)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.TimeSlot.Date)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.StartTime)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.TimeSlot.StartTime)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.EndTime)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.TimeSlot.EndTime)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Service.Price)
+                </dt>
+                <dd class="col-sm-10">
+                    @service.Price
+                </dd>
+                <dt class="col-sm-2">
+                    Бронювання створено
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Info)
+                </dd>
+                <hr />
+                <fieldset>
+                    <legend>Інформація про клієнта</legend>
+                </fieldset>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Client.FirstName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Client.FirstName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Client.LastName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Client.LastName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Client.PhoneNumber)
+                </dt>
+                <dd class="col-sm-10">
+                    <text>@BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(Model.Client.PhoneNumber)</text>
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Client.Email)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Client.Email)
+                </dd>
+                <hr />
+                <fieldset>
+                    <legend>Інформація про майстра</legend>
+                </fieldset>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Employee.FirstName)
+                </dt>
+                <dd class="col-sm-10">
+                    @employee.FirstName
+                </dd>
+                <dt class="col-sm-2">
+                    Прізвище
+                </dt>
+                <dd class="col-sm-10">
+                    @employee.LastName
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TimeSlot.EmployeeService.Employee.PhoneNumber)
+                </dt>
+                <dd class="col-sm-10">
+                    @BeautySpaceInfrastructure.Models.Helper.FormatPhoneNumber(employee.PhoneNumber)
+                </dd>
+
+            </dl>
+        </div>
 
         <form asp-action="Delete">
             <input type="hidden" asp-for="Id" />

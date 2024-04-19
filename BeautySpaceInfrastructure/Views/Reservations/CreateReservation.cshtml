@@ -1,4 +1,6 @@
 ﻿@model BeautySpaceInfrastructure.ViewModel.ReservationViewModel
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
 
 @{
     ViewData["Title"] = "Створення бронювання";
@@ -7,23 +9,24 @@
  <div class="content">
         <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-        <label asp-for="ClientId" class="control-label"></label>
-        <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
-        <span id="clientIdError" class="text-danger" style="display: @(ViewData.ModelState.ContainsKey("ClientId") ? "inline" : "none")">
-            @Html.ValidationMessageFor(model => model.ClientId, "", new { @class = "text-danger" })
-        </span>
-    </div>
+        <div class="form-group">
+            <label asp-for="ClientId" class="control-label">Клієнт</label>
+            <select asp-for="ClientId" class="form-control" id="ClientId" name="ClientId"></select>
+            <span id="clientIdError" class="text-danger" style="display: @(ViewData.ModelState.ContainsKey("ClientId") ? "inline" : "none")">
+                @Html.ValidationMessageFor(model => model.ClientId, "", new { @class = "text-danger" })
+            </span>
+        </div>
+
 
     <div class="form-group">
-        <label asp-for="CategoryId" class="control-label">Category</label>
+        <label asp-for="CategoryId" class="control-label">Категорія</label>
         <select id="CategoryId" class="form-control" asp-for="CategoryId" asp-items="ViewBag.CategoryId">
             <option value="" disabled selected>Оберіть категорію</option>
         </select>
     </div>
 
     <div class="form-group">
-        <label asp-for="ServiceId" class="control-label">Service</label>
+        <label asp-for="ServiceId" class="control-label">Послуга</label>
         <select id="ServiceId" class="form-control" asp-for="ServiceId">
             <option value="" disabled selected>Спочатку оберіть категорію</option>
         </select>
@@ -31,7 +34,7 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="EmployeeServiceId" class="control-label">Employee</label>
+        <label asp-for="EmployeeServiceId" class="control-label">Працівник</label>
         <select id="EmployeeServiceId" class="form-control" asp-for="EmployeeServiceId" asp-items="ViewBag.EmployeeServiceId">
             <option value="" disabled selected>Спочатку оберіть послугу</option>
         </select>
@@ -41,7 +44,7 @@
 
     @* дата *@
         <div class="form-group">
-            <label asp-for="TimeSlotId" class="control-label">Time Slot</label>
+            <label asp-for="TimeSlotId" class="control-label">Дата та час</label>
             <select id="TimeSlot" class="form-control" asp-for="TimeSlotId" asp-items="ViewBag.TimeSlotId">
                 <option value="" disabled selected>Спочатку оберіть майстра</option>
             </select>
@@ -61,6 +64,34 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#ClientId').select2({
+                placeholder: 'Виберіть клієнта',
+                language: {
+                    noResults: function () {
+                        return "Відповідних результатів не знайдено";
+                    },
+                    searching: function () {
+                        return "Пошук…";
+                    }
+                },
+                ajax: {
+                    url: '/Reservations/SearchClients',
+                    dataType: 'json',
+                    delay: 25,
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0 // Мінімальна довжина введеного тексту для запуску пошуку
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function () {

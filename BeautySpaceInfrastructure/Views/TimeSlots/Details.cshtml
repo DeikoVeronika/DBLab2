@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Деталі timeslot";
+    DbbeautySpaceContext dbbeautySpaceContext = new DbbeautySpaceContext();
+
 }
 
 
@@ -34,18 +36,12 @@
             <dd class="col-sm-10">
                 @Html.DisplayFor(model => model.IsBooked)
             </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.EmployeeService)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.EmployeeService.Id)
-            </dd>
         </dl>
     </div>
     <div>
         @if (Accessibility.AllExceptUser(User))
         {
-            <a class="btn-back-new" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+            <a class="btn-back-new" asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a>
         }
         <a class="btn-back-new" asp-action="Index">Назад</a>
     </div>

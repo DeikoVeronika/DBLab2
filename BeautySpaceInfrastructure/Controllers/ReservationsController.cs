@@ -334,5 +334,19 @@ namespace BeautySpaceInfrastructure.Controllers
             return selectList;
         }
 
+        [HttpGet]
+        public IActionResult SearchClients(string term)
+        {
+            var clients = _context.Clients
+                .Where(c => c.PhoneNumber.Contains(term))
+                .Select(c => new {
+                    id = c.Id,
+                    text = FormatPhoneNumber(c.PhoneNumber)
+                })
+                .ToList();
+
+            return Json(clients);
+        }
+
     }
 }
