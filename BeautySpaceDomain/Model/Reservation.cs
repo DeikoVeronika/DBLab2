@@ -19,4 +19,12 @@ public partial class Reservation : Entity
 
     [Display(Name = "Час")]
     public virtual TimeSlot? TimeSlot { get; set; } = null!;
+
+    public Reservation() { }
+
+    public Reservation(int clientId, int timeSlotId)
+    {
+        TimeSlotId = timeSlotId;
+        ClientId = clientId;
+    }
 }

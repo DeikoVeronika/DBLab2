@@ -24,14 +24,14 @@
 
         <div class="form-group">
             <label asp-for="ServiceId" class="control-label">Послуга</label>
-            <select id="ServiceId" class="form-control" asp-for="ServiceId">
+            <select id="ServiceId" class="form-control" asp-for="ServiceId" asp-items="ViewBag.ServiceId">
                 <option value="" disabled selected>Спочатку оберіть категорію</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label asp-for="EmployeeServiceId" class="control-label">Працівник</label>
-            <select id="EmployeeServiceId" class="form-control" asp-for="EmployeeServiceId" asp-items="ViewBag.EmployeeServiceId">
+            <label asp-for="EmployeeId" class="control-label">Працівник</label>
+            <select id="EmployeeServiceId" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.EmployeeId">
                 <option value="" disabled selected>Спочатку оберіть послугу</option>
             </select>
         </div>
@@ -55,4 +55,184 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            $(document).ready(async function () {
+                const selectedServiceId = $('#ServiceId').val();
+                const selectedEmployeeServiceId = $('#EmployeeServiceId').val();
+                const selectedTimeSlot = $('#TimeSlot').val();
+
+                const categoryId = $('#CategoryId').val();
+                if (categoryId) {
+                    const services = await fetchServices(categoryId);
+                    populateServices(services);
+
+                    $('#ServiceId').change();
+                }
+
+                if (selectedServiceId) {
+                    $('#ServiceId').val(selectedServiceId);
+                }
+                if (selectedEmployeeServiceId) {
+                    $('#EmployeeServiceId').val(selectedEmployeeServiceId);
+                }
+
+                const serviceId = $('#ServiceId').val();
+                const employeeServiceId = $('#EmployeeServiceId').val();
+
+                if (serviceId) {
+                    const employees = await fetchEmployees(serviceId);
+                    populateEmployees(employees);
+                    if (employeeServiceId) {
+                        $('#EmployeeServiceId').val(employeeServiceId);
+                    }
+                }
+
+                const selectedEmployeeServiceIdAfterPopulate = $('#EmployeeServiceId').val();
+                if (selectedEmployeeServiceIdAfterPopulate) {
+                    const timeSlots = await fetchTimeSlots(selectedEmployeeServiceIdAfterPopulate, serviceId);
+                    populateTimeSlots(timeSlots);
+                }
+
+                if (selectedTimeSlot) {
+                    $('#TimeSlot').val(selectedTimeSlot);
+                }
+            });
+
+
+
+
+            async function fetchServices(categoryId) {
+                const response = await $.ajax({
+                    url: '/Services/GetServicesByCategory',
+                    type: 'GET',
+                    data: { categoryId: categoryId }
+                });
+                return response;
+            }
+
+            function createOption(value, text, disabled = false, selected = false) {
+                return $('<option>', {
+                    value: value,
+                    text: text,
+                    disabled: disabled,
+                    selected: selected
+                });
+            }
+
+            function populateServices(services) {
+                const serviceSelect = $('#ServiceId');
+                serviceSelect.empty();
+
+                if (services.length === 0) {
+                    serviceSelect.append(createOption('', 'Список послуг порожній', true, true));
+                } else {
+                    serviceSelect.append(createOption('', 'Оберіть послугу', true, true));
+                    services.forEach(item => {
+                        serviceSelect.append(createOption(item.value, item.text));
+                    });
+                }
+            }
+
+            $('#CategoryId').change(async function () {
+                const categoryId = $(this).val();
+                if (categoryId) {
+                    const services = await fetchServices(categoryId);
+                    populateServices(services);
+
+                    $('#EmployeeServiceId').empty().append(createOption('', 'Спочатку оберіть послугу', true, true));
+                    $('#TimeSlot').empty().append(createOption('', 'Спочатку оберіть майстра', true, true));
+
+
+                    $('#ServiceId, #EmployeeServiceId, #TimeSlot').prop('disabled', false);
+                } else {
+                    $('#ServiceId, #EmployeeServiceId, #TimeSlot').empty()
+                        .append(createOption('', 'Спочатку оберіть категорію', true, true));
+
+                    $('#ServiceId, #EmployeeServiceId, #TimeSlot').prop('disabled', true);
+                }
+            });
+
+
+            async function fetchEmployees(serviceId) {
+                const response = await $.ajax({
+                    url: '/TimeSlots/GetEmployeesByServiceId',
+                    type: 'GET',
+                    data: { serviceId: serviceId }
+                });
+                return response;
+            }
+
+            function populateEmployees(employees) {
+                const employeeSelect = $('#EmployeeServiceId');
+                employeeSelect.empty();
+
+                if (employees.length === 0) {
+                    employeeSelect.append(createOption('', 'Список працівників порожній', true, true));
+                } else {
+                    employeeSelect.append(createOption('', 'Оберіть працівника', true, true));
+                    employees.forEach(item => {
+                        employeeSelect.append(createOption(item.value, item.text));
+                    });
+                }
+            }
+
+            $('#ServiceId').change(async function () {
+                const serviceId = $(this).val();
+                if (serviceId) {
+                    const employees = await fetchEmployees(serviceId);
+                    populateEmployees(employees);
+
+                    $('#TimeSlot').val('');
+
+                    setEmployeeServiceIdState(false);
+                    setTimeSlotState(true);
+
+                    $('#TimeSlot').empty().append(createOption('', 'Спочатку оберіть майстра', true, true));
+                } else {
+                    setEmployeeServiceIdState(true);
+                    setTimeSlotState(true);
+                }
+            });
+
+            async function fetchTimeSlots(employeeServiceId, serviceId) {
+                const response = await $.ajax({
+                    url: '/TimeSlots/GetTimeSlotsByEmployeeServiceId',
+                    type: 'GET',
+                    data: { employeeId: employeeServiceId, serviceId: serviceId }
+                });
+                return response;
+            }
+
+            function populateTimeSlots(timeSlots) {
+                const timeSlotSelect = $('#TimeSlot');
+                timeSlotSelect.empty();
+
+                if (timeSlots.length === 0) {
+                    timeSlotSelect.append(createOption('', 'Бронювання у цього працівника для цієї послуги наразі недоступні', true, true));
+                } else {
+                    timeSlotSelect.append(createOption('', 'Оберіть час', true, true));
+                    timeSlots.forEach(item => {
+                        timeSlotSelect.append(createOption(item.value, item.text));
+                    });
+                }
+            }
+
+            $('#EmployeeServiceId').change(async function () {
+                const employeeServiceId = $(this).val();
+                const serviceId = $('#ServiceId').val();
+                if (employeeServiceId && serviceId) {
+                    const timeSlots = await fetchTimeSlots(employeeServiceId, serviceId);
+                    populateTimeSlots(timeSlots);
+
+                    setTimeSlotState(false);
+                } else {
+                    setTimeSlotState(true);
+                }
+            });
+        });
+
+    </script>
 }
+    

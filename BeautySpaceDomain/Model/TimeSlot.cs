@@ -28,6 +28,5 @@ public partial class TimeSlot : Entity
     public bool IsBooked { get; set; }
 
     public virtual EmployeeService? EmployeeService { get; set; } = null!;
-
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 }

@@ -2,6 +2,7 @@ using BeautySpaceInfrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using BeautySpaceDomain.Model;
+using BeautySpaceInfrastructure.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,3 +60,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+

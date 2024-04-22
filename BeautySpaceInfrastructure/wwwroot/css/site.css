@@ -152,7 +152,7 @@ p[action="right"] {
 
 .btn-new {
     transition: border-color 0.2s ease;
-    padding: 12px 24px;
+    padding: 13px 25px;
 }
 
 .btn-back-new:hover {
@@ -160,6 +160,7 @@ p[action="right"] {
 }
 
 .btn-new:hover {
+    padding: 12px 24px;
     border: 1px solid black;
 }
 

@@ -17,32 +17,28 @@
             </span>
         </div>
 
+        <div class="form-group">
+            <label asp-for="CategoryId" class="control-label">Категорія</label>
+            <select id="CategoryId" class="form-control" asp-for="CategoryId" asp-items="ViewBag.CategoryId">
+                <option value="" disabled selected>Оберіть категорію</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="CategoryId" class="control-label">Категорія</label>
-        <select id="CategoryId" class="form-control" asp-for="CategoryId" asp-items="ViewBag.CategoryId">
-            <option value="" disabled selected>Оберіть категорію</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label asp-for="ServiceId" class="control-label">Послуга</label>
+            <select id="ServiceId" class="form-control" asp-for="ServiceId">
+                <option value="" disabled selected>Спочатку оберіть категорію</option>
+            </select>
 
-    <div class="form-group">
-        <label asp-for="ServiceId" class="control-label">Послуга</label>
-        <select id="ServiceId" class="form-control" asp-for="ServiceId">
-            <option value="" disabled selected>Спочатку оберіть категорію</option>
-        </select>
+        </div>
 
-    </div>
+        <div class="form-group">
+            <label asp-for="EmployeeServiceId" class="control-label">Працівник</label>
+            <select id="EmployeeServiceId" class="form-control" asp-for="EmployeeServiceId" asp-items="ViewBag.EmployeeServiceId">
+                <option value="" disabled selected>Спочатку оберіть послугу</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="EmployeeServiceId" class="control-label">Працівник</label>
-        <select id="EmployeeServiceId" class="form-control" asp-for="EmployeeServiceId" asp-items="ViewBag.EmployeeServiceId">
-            <option value="" disabled selected>Спочатку оберіть послугу</option>
-        </select>
-    </div>
-
-
-
-    @* дата *@
         <div class="form-group">
             <label asp-for="TimeSlotId" class="control-label">Дата та час</label>
             <select id="TimeSlot" class="form-control" asp-for="TimeSlotId" asp-items="ViewBag.TimeSlotId">
@@ -50,11 +46,10 @@
             </select>
         </div>
 
-
-    <div class="edit-create-or-back">
-        <input type="submit" value="Створити" class="btn btn-primary" />
-        <a class="btn-back-new" asp-action="Index">Скасувати</a>
-    </div>
+        <div class="edit-create-or-back">
+            <input type="submit" value="Створити" class="btn btn-primary" />
+            <a class="btn-back-new" asp-action="Index">Скасувати</a>
+        </div>
 
     </form>
 
@@ -88,34 +83,29 @@
                     },
                     cache: true
                 },
-                minimumInputLength: 0 // Мінімальна довжина введеного тексту для запуску пошуку
+                minimumInputLength: 0 
             });
         });
     </script>
 
     <script>
         $(document).ready(function () {
-            // Функція для встановлення стану ServiceId
             function setServiceIdState(disabled) {
                 $('#ServiceId').prop('disabled', disabled);
             }
 
-            // Функція для встановлення стану EmployeeServiceId
             function setEmployeeServiceIdState(disabled) {
                 $('#EmployeeServiceId').prop('disabled', disabled);
             }
 
-            // Функція для встановлення стану TimeSlot
             function setTimeSlotState(disabled) {
                 $('#TimeSlot').prop('disabled', disabled);
             }
 
-            // Початковий стан ServiceId, EmployeeServiceId та TimeSlot
             setServiceIdState(true);
             setEmployeeServiceIdState(true);
             setTimeSlotState(true);
 
-            // При зміні значення категорії
             async function fetchServices(categoryId) {
                 const response = await $.ajax({
                     url: '/Services/GetServicesByCategory',
@@ -168,7 +158,6 @@
             });
 
 
-            // При зміні ServiceId
             async function fetchEmployees(serviceId) {
                 const response = await $.ajax({
                     url: '/TimeSlots/GetEmployeesByServiceId',

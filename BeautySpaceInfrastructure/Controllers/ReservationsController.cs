@@ -15,10 +15,12 @@ namespace BeautySpaceInfrastructure.Controllers
     public class ReservationsController : Controller
     {
         private readonly DbbeautySpaceContext _context;
+        private ReservationViewModel _reservationViewModel;
 
         public ReservationsController(DbbeautySpaceContext context)
         {
             _context = context;
+            _reservationViewModel = new ReservationViewModel();
         }
         //private List<Client> GetClients()
         //{
@@ -100,7 +102,7 @@ namespace BeautySpaceInfrastructure.Controllers
 
         public IActionResult CreateReservation()
         {
-            var reservationViewModel = new ReservationViewModel();
+            //var reservationViewModel = new ReservationViewModel();
 
             ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "PhoneNumber");
 
@@ -114,7 +116,7 @@ namespace BeautySpaceInfrastructure.Controllers
             ViewData["TimeSlotDateId"] = new SelectList(_context.TimeSlots, "Id", "Date");
             ViewData["TimeSlotTimeId"] = new SelectList(_context.TimeSlots, "Id", "StartTime");
 
-            return View(reservationViewModel);
+            return View(_reservationViewModel);
         }
 
 
@@ -162,15 +164,18 @@ namespace BeautySpaceInfrastructure.Controllers
                     await _context.SaveChangesAsync();
                 }
 
+                _reservationViewModel = reservationViewModel;
+
                 return RedirectToAction(nameof(Index));
             }
 
             ViewData["ClientId"] = new SelectList(GetClientsSelectList(), "Value", "Text", reservationViewModel.ClientId);
             ViewData["TimeSlotId"] = new SelectList(GetTimeSlotsSelectList(), "Value", "Text", reservationViewModel.TimeSlotId);
+
+            //_reservationViewModel = reservationViewModel;
+
             return View(reservationViewModel);
         }
-
-
 
 
 
@@ -188,18 +193,38 @@ namespace BeautySpaceInfrastructure.Controllers
                 return NotFound();
             }
 
+            var employeeServiceId = _context.TimeSlots.FirstOrDefault(t => t.Id == reservation.TimeSlotId).EmployeeServiceId;
+            var employeeService = _context.EmployeeServices.Find(employeeServiceId);
+            var employeeId = employeeService.EmployeeId;
+            var serviceId = employeeService.ServiceId;
+            var categoryId = _context.Services.Find(serviceId).CategoryId;
+
             // Мапування Reservation на ReservationViewModel
             var reservationViewModel = new ReservationViewModel
             {
                 Reservation = reservation,
                 ClientId = reservation.ClientId,
+                TimeSlotId = reservation.TimeSlotId,
+                EmployeeServiceId = employeeServiceId,
+                ServiceId = serviceId,
+                CategoryId = categoryId,
+                EmployeeId = employeeId
                 // Додайте інші властивості ReservationViewModel, які вам потрібні для редагування
             };
 
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email", reservation.ClientId);
-            ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Id", reservation.TimeSlotId);
+            _reservationViewModel = reservationViewModel;
+            //var reservationModel1 = new ReservationViewModel(_context, reservation, employeeServiceId)
 
-            return View(reservationViewModel);
+
+            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email", _reservationViewModel.ClientId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", _reservationViewModel.CategoryId);
+            ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", _reservationViewModel.ServiceId);
+
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FirstName", _reservationViewModel.EmployeeId);
+            ViewData["EmployeeServiceId"] = new SelectList(_context.EmployeeServices, "Id", "EmployeeId", _reservationViewModel.EmployeeServiceId);
+            ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Date", _reservationViewModel.TimeSlotId);
+
+            return View(_reservationViewModel);
         }
 
 
@@ -208,18 +233,34 @@ namespace BeautySpaceInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ClientId,Info,TimeSlotId,Id")] Reservation reservation)
+        public async Task<IActionResult> Edit(int id, [Bind("ClientId,Info,TimeSlotId,Id, EmployeeServiceId, CategoryId, ServiceId, EmployeeId")] ReservationViewModel reservationViewModel)
         {
-            if (id != reservation.Id)
-            {
-                return NotFound();
-            }
+            // _reservationViewModel = new ReservationViewModel(_context, reservationViewModel.Reservation, Convert.ToInt32(Request.Form["EmployeeServiceId"]));
+            
+            //reservationViewModel.Reservation = new Reservation(reservationViewModel.ClientId, reservationViewModel.TimeSlotId);
+            
+            
+            // var reservationId = _context.Reservations.FirstOrDefault(r => r.ClientId == reservationViewModel.ClientId && r.TimeSlotId == reservationViewModel.TimeSlotId).Id;
+
+            //if (id != reservationId)
+            //{
+            //    return NotFound();
+            //}
+
+
+            var reservation = _context.Reservations.Find(id);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(reservation);
+                    
+                    if (reservation != null)
+                    {
+                        reservation.TimeSlotId = reservationViewModel.TimeSlotId;
+                        reservation.ClientId = reservationViewModel.ClientId;
+                    }
+;                    _context.Update(reservation);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -235,9 +276,9 @@ namespace BeautySpaceInfrastructure.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email", reservation.ClientId);
-            ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Id", reservation.TimeSlotId);
-            return View(reservation);
+            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Email", reservationViewModel.ClientId);
+            ViewData["TimeSlotId"] = new SelectList(_context.TimeSlots, "Id", "Id", reservationViewModel.TimeSlotId);
+            return View(reservationViewModel);
         }
 
         // GET: Reservations/Delete/5
