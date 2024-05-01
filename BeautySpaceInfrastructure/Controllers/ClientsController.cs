@@ -240,7 +240,7 @@ namespace BeautySpaceInfrastructure.Controllers
                     return true;
                 }
             }
-
+                
             return false;
         }
 
