@@ -5,6 +5,7 @@ using BeautySpaceDomain.Model;
 
 namespace BeautySpaceInfrastructure.Controllers
 {
+    //account
     public class AccountController : Controller
     {
 
